@@ -49,7 +49,9 @@ app.get('/readMore', (req,res) => {
     res.render('readMorePage');
 });
 
-
+app.get('/search', (req,res) => {
+  res.render('search.ejs');
+})
 
 
 
