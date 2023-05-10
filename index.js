@@ -33,6 +33,27 @@ app.get('/', (req,res) => {
     res.send("Hello World!");
 });
 
+// app.get('/dish/:id', function(req, res) {
+//     var dishId = req.params.id;
+//     var dishName = getDishNameById(dishId); // Replace this with the database dish_id
+    
+//     res.render('dishCard', { dishName: dishName });
+//   });
+
+
+app.get('/dishcard', (req,res) => {
+    res.render('dishCard');
+});
+
+app.get('/readMore', (req,res) => {
+    res.render('readMorePage');
+});
+
+
+
+
+
+
 app.listen(port, () => {
 	console.log("Node application listening on port "+port);
 }); 
