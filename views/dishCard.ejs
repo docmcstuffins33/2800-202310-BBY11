@@ -4,15 +4,15 @@
     <div class="modal-dialog" role="document">
       <div class="modal-content rounded-4 shadow">
         <div class="modal-header border-bottom-0">
-          <h1 class="modal-title fs-5">DishName</h1>
+          <form action='/addToFavourites?dishName=<%= dishName %>' method='post'><button class="btn btn-secondary">Favourite</button></form>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
         <div class="modal-body py-0">
-          <p>THIS IS A DISH(Description)</p>
+          <h1 class="modal-title fs-5"><%= dishName %></h1>
+          <p><%= description %></p>
         </div>
         <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
-          <a type="button" class="btn btn-lg btn-primary" href="/readMore">Read More</a>
-          <a type="button" class="btn btn-lg btn-secondary" data-bs-dismiss="modal" href="/">Close</a>
+          <a type="button" class="btn btn-lg btn-primary" href="/readMore?dishName=<%= dishName %>">Read More</a>
         </div>
       </div>
     </div>

@@ -33,12 +33,12 @@ app.get('/', (req,res) => {
     res.send("Hello World!");
 });
 
-// app.get('/dish/:id', function(req, res) {
-//     var dishId = req.params.id;
-//     var dishName = getDishNameById(dishId); // Replace this with the database dish_id
+app.get('/dish/:id', function(req, res) {
+    var dishId = req.params.id;
+    var dishName = dishId // Replace this with the database dish_id
     
-//     res.render('dishCard', { dishName: dishName });
-//   });
+    res.render('dishCard', { dishName: dishName, description: "fooood..." });
+  });
 
 
 app.get('/dishcard', (req,res) => {
@@ -46,13 +46,14 @@ app.get('/dishcard', (req,res) => {
 });
 
 app.get('/readMore', (req,res) => {
-    res.render('readMorePage');
+    res.render('readMorePage', {dishName: req.query.dishName});
 });
 
-
-
-
-
+app.post('/addToFavourites', async (req,res) => {
+    await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass", favourites: [{name: req.query.dishName}]});
+    console.log(req.query.dishName);
+    res.redirect(`/dish/${req.query.dishName}`);
+});
 
 app.listen(port, () => {
 	console.log("Node application listening on port "+port);
