@@ -179,7 +179,7 @@ app.post('/loginSubmit', async (req, res) => {
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
     req.session.user_type = result[0].user_type;
-    res.redirect('/');
+    res.redirect('/profile');
     return;
   }
   else {
@@ -193,18 +193,63 @@ app.get('/logout', (req, res) => {
   // var html = `
   //   You are logged out.
   //   `;
-  res.redirect('/');
+  res.redirect('/login');
 });
 
-app.get('/profile', (req, res) => {
+app.get('/profile', async (req, res) => {
+  const result = await userCollection.find().project({ username: 1, email: 1, password: 1, favourites: 1}).toArray();
   if (!req.session.authenticated) {
     // res.redirect('/login');
     res.render("profile_unauthenticated");
   } else {
-    var username = req.session.username;
-    res.render("profile", { username: username });
+    res.render("profile", { 
+      username: req.session.username,
+      users: result,
+      email: req.session.email,
+      password: req.session.password
+    });
   }
 });
+
+app.get('/reset', (req, res) => {
+  res.render("reset");
+});
+
+app.post('/changepw', async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+  const username = req.session.username; // Assuming you have access to the current user's username
+
+  try {
+    // Retrieve the user document from the database based on the username
+    const user = await userCollection.findOne({ username });
+
+    if (!user) {
+      // Handle the case if the user is not found
+      return res.redirect('/');
+    }
+
+    // Compare the current password with the stored password using bcrypt
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isPasswordValid) {
+      // Handle the case if the current password is incorrect
+      return res.render('login_error');
+    }
+
+    // Update the user's password with the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await userCollection.updateOne({ username }, { $set: { password: hashedNewPassword } });
+
+    // Redirect the user back to the account settings page with a success message
+    return res.redirect('/profile?success=passwordChanged');
+  } catch (error) {
+    // Handle any errors that occurred during the process
+    console.error('Error:', error);
+    return res.redirect('/profile?error=serverError');
+  }
+});
+
+
 
   //right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
 //add onto it, then update it
