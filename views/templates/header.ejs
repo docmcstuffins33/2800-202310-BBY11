@@ -41,20 +41,22 @@
 
     <script>
       // Get the current URL
-      var currentUrl = window.location.href;
+      var currentUrl = window.location.pathname;
     
       // Get the nav-link elements
+      var homeLink = document.getElementById('home-link');
       var searchLink = document.getElementById('search-link');
       var logsLink = document.getElementById('logs-link');
       var profileLink = document.getElementById('profile-link');
     
       // Set the initial active link based on the current URL
-      if (currentUrl.includes('/logpage')) {
+      if (currentUrl === '/' || currentUrl === '') {
+        homeLink.classList.add('active');
+      } else if (currentUrl.includes('/logpage')) {
         logsLink.classList.add('active');
       } else if (currentUrl.includes('/profile')) {
         profileLink.classList.add('active');
-      } else {
+      } else if (currentUrl.includes('/search')) {
         searchLink.classList.add('active');
       }
     </script>
-    
