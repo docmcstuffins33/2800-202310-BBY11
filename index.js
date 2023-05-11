@@ -37,6 +37,7 @@ app.get('/dish/:id', function(req, res) {
     var dishId = req.params.id;
     var dishName = dishId // Replace this with the database dish_id
     
+    //placeholders
     res.render('dishCard', { dishName: dishName, description: "fooood..." });
   });
 
@@ -49,8 +50,14 @@ app.get('/readMore', (req,res) => {
     res.render('readMorePage', {dishName: req.query.dishName});
 });
 
+//right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
+//add onto it, then update it
 app.post('/addToFavourites', async (req,res) => {
-    await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass", favourites: [{name: req.query.dishName}]});
+    var username = "test"
+    const result = await userCollection.find({username: username}).project({favourites: 1}).toArray();
+    var favourites = result[0].favourites;
+    favourites.push({name: req.query.dishName})
+    await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
     console.log(req.query.dishName);
     res.redirect(`/dish/${req.query.dishName}`);
 });
