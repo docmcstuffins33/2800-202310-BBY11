@@ -196,13 +196,41 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
-app.get('/profile', (req, res) => {
+app.get('/profile', async (req, res) => {
+  const result = await userCollection.find().project({ username: 1, email: 1, password: 1, favourites: 1}).toArray();
   if (!req.session.authenticated) {
     // res.redirect('/login');
     res.render("profile_unauthenticated");
   } else {
-    var username = req.session.username;
-    res.render("profile", { username: username });
+    res.render("profile", { 
+      username: req.session.username,
+      users: result,
+      email: req.session.email,
+      password: req.session.password
+    });
+  }
+});
+
+app.get('/reset', (req, res) => {
+  res.render("reset");
+});
+
+app.post('/changepw', async (req, res) => {
+  var password = req.body.password;
+  
+  if (await bcrypt.compare(password, result[0].password)) {
+    username = result[0].username;
+    console.log("correct password");
+    await userCollection.findOneAndUpdate(
+      { username: username },
+      { $set: { password: password } }
+    );
+    res.redirect('profile');
+    return;
+  }
+  else {
+    res.render("login_error");
+    return;
   }
 });
 
