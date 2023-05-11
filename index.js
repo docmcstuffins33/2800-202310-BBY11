@@ -179,7 +179,7 @@ app.post('/loginSubmit', async (req, res) => {
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
     req.session.user_type = result[0].user_type;
-    res.redirect('/');
+    res.redirect('/profile');
     return;
   }
   else {
