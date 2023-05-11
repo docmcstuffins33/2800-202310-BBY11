@@ -4,9 +4,9 @@
     <div class="row">
       <div class="col-12">
         <div class="card">
-            <a href="/" onclick="history.go(-1); return false;"><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></a>
             <div class="card-body">
-              <form action='/addToFavourites?dishName=<%= dishName %>' method='post'><button class="btn btn-secondary">Favourite</button></form>
+              <a href="/" onclick="history.go(-1); return false;"><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></a>
+              <i id="star-icon" class="far fa-star"></i>
             <h5 class="card-title"><%= dishName %></h5>
             <p class="card-text">Ingredients: Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
             <p class="card-text">Author: John Smith</p>
