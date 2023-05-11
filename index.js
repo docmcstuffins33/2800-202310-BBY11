@@ -36,6 +36,7 @@ var mongoStore = MongoStore.create({
 var { database } = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
+const dishCollection = database.db(mongodb_database).collection("dishes");
 
 
 app.use(express.urlencoded({ extended: false }));
@@ -70,7 +71,7 @@ app.get('/dishcard', (req, res) => {
 });
 
 app.get('/readMore', (req, res) => {
-  res.render('readMorePage', { dishName: req.query.dishName });
+    res.render('readMorePage', {dish: req.query.dish});
 });
 
 app.get('/search', (req, res) => {
@@ -78,11 +79,11 @@ app.get('/search', (req, res) => {
 });
 
 app.get('/logpage', (req, res) => {
-  const dishes = [
-    { name: 'Spaghetti Carbonara', description: 'Pasta with bacon and eggs' },
-    { name: 'Chicken Tikka Masala', description: 'Indian curry with chicken' },
-    { name: 'Caesar Salad', description: 'Salad with romaine lettuce and croutons' },
-  ];
+  var dishes = [];
+  var history = req.session.history;
+  for (let i = 0; i < history.length; i++) {
+    dishes.push(history[i]);
+  }
 
 
   res.render('logPage', { dishes });
@@ -176,6 +177,9 @@ app.post('/loginSubmit', async (req, res) => {
     console.log("correct password");
     req.session.authenticated = true;
     req.session.username = result[0].username;
+    req.session.favourites = result[0].favourites;
+    var dish = await dishCollection.find({ name: "amish  tomato ketchup  for canning" }).toArray();
+    req.session.history = [dish[0]];
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
     req.session.user_type = result[0].user_type;
@@ -253,15 +257,32 @@ app.post('/changepw', async (req, res) => {
 
   //right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
 //add onto it, then update it
-app.post('/addToFavourites', async (req,res) => {
-    var username = "test"
-    const result = await userCollection.find({username: username}).project({favourites: 1}).toArray();
-    var favourites = result[0].favourites;
-    favourites.push({name: req.query.dishName})
+app.post('/favourite', async (req,res) => {
+    console.log("hi");
+    var history = req.session.history;
+    var dish = history.find(element => element.name == req.query.dishName);
+
+    var favourites = req.session.favourites;
+    var username = req.session.username;
+
+    console.log(favourites);
+
+    if(favourites == "") {
+        favourites = [];
+    }
+    
+    if(favourites.includes(dish)) {
+        favourites.splice(favourites.indexOf(dish), 1);
+    } else {
+        favourites.push(dish);
+    }
+    req.session.favourites = favourites;
     await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
-    console.log(req.query.dishName);
     res.redirect(`/logpage`);
 });
+
+
+
 app.listen(port, () => {
   console.log("Node application listening on port " + port);
 }); 
