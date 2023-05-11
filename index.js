@@ -36,6 +36,7 @@ var mongoStore = MongoStore.create({
 var {database} = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
+const dishCollection = database.db(mongodb_database).collection("dishes");
 
 
 app.use(express.urlencoded({extended: false}));
@@ -70,7 +71,7 @@ app.get('/dishcard', (req,res) => {
 });
 
 app.get('/readMore', (req,res) => {
-    res.render('readMorePage', {dishName: req.query.dishName});
+    res.render('readMorePage', {dish: req.query.dish});
 });
 
 app.get('/search', (req,res) => {
@@ -176,6 +177,8 @@ app.post('/loginSubmit', async (req, res) => {
     console.log("correct password");
     req.session.authenticated = true;
     req.session.username = result[0].username;
+    req.session.favourites = result[0].favourites;
+    req.session.history = result[0].history;
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
     req.session.user_type = result[0].user_type;
@@ -200,15 +203,27 @@ app.get('/logout', (req, res) => {
   
   //right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
 //add onto it, then update it
-app.post('/addToFavourites', async (req,res) => {
-    var username = "test"
-    const result = await userCollection.find({username: username}).project({favourites: 1}).toArray();
-    var favourites = result[0].favourites;
-    favourites.push({name: req.query.dishName})
-    await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
-    console.log(req.query.dishName);
+async function favourite(dish) {
+    var favourites = req.session.favourites;
+    var username = req.session.username;
+
+    console.log(favourites);
+
+    if(favourites == "") {
+        favourites = [];
+    }
+    
+    if(favourites.includes(dish)) {
+        favourites.splice(favourites.indexOf(dish), 1);
+    } else {
+        favourites.push(dish);
+    }
+    req.session.favourites = favourites;
+    userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
     res.redirect(`/logpage`);
-});
+};
+
+
 
 app.listen(port, () => {
 	console.log("Node application listening on port "+port);
