@@ -56,12 +56,13 @@ app.get('/', (req,res) => {
     res.render('index');
 });
 
-// app.get('/dish/:id', function(req, res) {
-//     var dishId = req.params.id;
-//     var dishName = getDishNameById(dishId); // Replace this with the database dish_id
+app.get('/dish/:id', function(req, res) {
+    var dishId = req.params.id;
+    var dishName = dishId // Replace this with the database dish_id
     
-//     res.render('dishCard', { dishName: dishName });
-//   });
+    //placeholders
+    res.render('dishCard', { dishName: dishName, description: "fooood..." });
+  });
 
 
 app.get('/dishcard', (req,res) => {
@@ -69,7 +70,7 @@ app.get('/dishcard', (req,res) => {
 });
 
 app.get('/readMore', (req,res) => {
-    res.render('readMorePage');
+    res.render('readMorePage', {dishName: req.query.dishName});
 });
 
 app.get('/search', (req,res) => {
@@ -83,6 +84,7 @@ app.get('/logpage', (req,res) => {
         { name: 'Caesar Salad', description: 'Salad with romaine lettuce and croutons' },
       ];
       
+
     res.render('logPage', {dishes});
   });
 
@@ -192,6 +194,18 @@ app.get('/logout', (req, res) => {
 });
 
 
+  
+  //right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
+//add onto it, then update it
+app.post('/addToFavourites', async (req,res) => {
+    var username = "test"
+    const result = await userCollection.find({username: username}).project({favourites: 1}).toArray();
+    var favourites = result[0].favourites;
+    favourites.push({name: req.query.dishName})
+    await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
+    console.log(req.query.dishName);
+    res.redirect(`/logpage`);
+});
 
 app.listen(port, () => {
 	console.log("Node application listening on port "+port);
