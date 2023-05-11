@@ -193,7 +193,7 @@ app.get('/logout', (req, res) => {
   // var html = `
   //   You are logged out.
   //   `;
-  res.redirect('/');
+  res.redirect('/login');
 });
 
 app.get('/profile', async (req, res) => {
@@ -216,23 +216,40 @@ app.get('/reset', (req, res) => {
 });
 
 app.post('/changepw', async (req, res) => {
-  var password = req.body.password;
-  
-  if (await bcrypt.compare(password, result[0].password)) {
-    username = result[0].username;
-    console.log("correct password");
-    await userCollection.findOneAndUpdate(
-      { username: username },
-      { $set: { password: password } }
-    );
-    res.redirect('profile');
-    return;
-  }
-  else {
-    res.render("login_error");
-    return;
+  const { currentPassword, newPassword } = req.body;
+  const username = req.session.username; // Assuming you have access to the current user's username
+
+  try {
+    // Retrieve the user document from the database based on the username
+    const user = await userCollection.findOne({ username });
+
+    if (!user) {
+      // Handle the case if the user is not found
+      return res.redirect('/');
+    }
+
+    // Compare the current password with the stored password using bcrypt
+    const isPasswordValid = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isPasswordValid) {
+      // Handle the case if the current password is incorrect
+      return res.render('login_error');
+    }
+
+    // Update the user's password with the new password
+    const hashedNewPassword = await bcrypt.hash(newPassword, 10);
+    await userCollection.updateOne({ username }, { $set: { password: hashedNewPassword } });
+
+    // Redirect the user back to the account settings page with a success message
+    return res.redirect('/profile?success=passwordChanged');
+  } catch (error) {
+    // Handle any errors that occurred during the process
+    console.error('Error:', error);
+    return res.redirect('/profile?error=serverError');
   }
 });
+
+
 
   //right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
 //add onto it, then update it
