@@ -89,6 +89,17 @@ app.get('/logpage', (req, res) => {
   res.render('logPage', { dishes });
 });
 
+app.get('/favourites', (req, res) => {
+    var dishes = [];
+    var favourites = req.session.favourites;
+    for (let i = 0; i < favourites.length; i++) {
+      dishes.push(favourites[i]);
+    }
+  
+  
+    res.render('favourites', { dishes });
+  });
+
 
 
 app.use(express.static(__dirname + "/public"));
@@ -144,6 +155,8 @@ app.post('/signupSubmit', async (req, res) => {
   req.session.authenticated = true;
   req.session.username = username;
   req.session.cookie.maxAge = expireTime;
+  req.session.favourites = [];
+  req.session.history = [];
 
   res.redirect('/');
   return;
@@ -267,18 +280,23 @@ app.post('/favourite', async (req,res) => {
 
     console.log(favourites);
 
+    var removed = false;
+
     if(favourites == "") {
         favourites = [];
     }
-    
-    if(favourites.includes(dish)) {
-        favourites.splice(favourites.indexOf(dish), 1);
-    } else {
+    for(i = 0; i < favourites.length; i++) {
+        if(dish.name == favourites[i].name) {
+            favourites.splice(i, 1);
+            removed = true;
+        }
+    }
+    if(!removed){
         favourites.push(dish);
     }
     req.session.favourites = favourites;
     await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
-    res.redirect(`/logpage`);
+    res.redirect(`/${req.query.page}`);
 });
 
 

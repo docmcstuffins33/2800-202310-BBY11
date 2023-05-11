@@ -7,7 +7,7 @@
 
 <div class="history">
   <% for (let i = 0; i < dishes.length; i++) { %>
-    <%- include("templates/logCard", { dish: dishes[i] }) %>
+    <%- include("templates/logCard", { dish: dishes[i], page: "logPage" }) %>
   <% } %>
 </div>
 
