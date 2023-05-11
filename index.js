@@ -33,60 +33,65 @@ var mongoStore = MongoStore.create({
   }
 })
 
-var {database} = include('databaseConnection');
+var { database } = include('databaseConnection');
 
 const userCollection = database.db(mongodb_database).collection('users');
 
 
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 
 
 app.set('view engine', 'ejs');
 
-app.use(session({ 
+app.use(session({
   secret: node_session_secret,
   store: mongoStore, //default is memory store 
-  saveUninitialized: false, 
+  saveUninitialized: false,
   resave: true
 }
 ));
 
-app.get('/', (req,res) => {
-    //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
-    res.render('index');
+app.get('/', (req, res) => {
+  //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
+  res.render('index');
 });
 
-// app.get('/dish/:id', function(req, res) {
-//     var dishId = req.params.id;
-//     var dishName = getDishNameById(dishId); // Replace this with the database dish_id
-    
-//     res.render('dishCard', { dishName: dishName });
-//   });
+app.get('/dish/:id', function (req, res) {
+  var dishId = req.params.id;
+  var dishName = dishId // Replace this with the database dish_id
 
-
-app.get('/dishcard', (req,res) => {
-    res.render('dishCard');
+  //placeholders
+  res.render('dishCard', { dishName: dishName, description: "fooood..." });
 });
 
-app.get('/readMore', (req,res) => {
-    res.render('readMorePage');
+
+app.get('/dishcard', (req, res) => {
+  res.render('dishCard');
 });
 
-app.get('/search', (req,res) => {
+app.get('/readMore', (req, res) => {
+  res.render('readMorePage', { dishName: req.query.dishName });
+});
+
+app.get('/search', (req, res) => {
   res.render('search');
 });
 
-app.get('/logpage', (req,res) => {
-    const dishes = [
-        { name: 'Spaghetti Carbonara', description: 'Pasta with bacon and eggs' },
-        { name: 'Chicken Tikka Masala', description: 'Indian curry with chicken' },
-        { name: 'Caesar Salad', description: 'Salad with romaine lettuce and croutons' },
-      ];
-      
-    res.render('logPage', {dishes});
-  });
+app.get('/logpage', (req, res) => {
+  const dishes = [
+    { name: 'Spaghetti Carbonara', description: 'Pasta with bacon and eggs' },
+    { name: 'Chicken Tikka Masala', description: 'Indian curry with chicken' },
+    { name: 'Caesar Salad', description: 'Salad with romaine lettuce and croutons' },
+  ];
 
-app.get('/signup', (req,res) => {
+
+  res.render('logPage', { dishes });
+});
+
+
+
+app.use(express.static(__dirname + "/public"));
+app.get('/signup', (req, res) => {
   res.render("signup");
 })
 
@@ -191,8 +196,30 @@ app.get('/logout', (req, res) => {
   res.redirect('/');
 });
 
+app.get('/profile', (req, res) => {
+  if (!req.session.authenticated) {
+    // res.redirect('/login');
+    res.render("profile_unauthenticated");
+  } else {
+    var username = req.session.username;
+    res.render("profile", { username: username });
+  }
+});
 
+
+
+//right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
+//add onto it, then update it
+app.post('/addToFavourites', async (req, res) => {
+  var username = "test"
+  const result = await userCollection.find({ username: username }).project({ favourites: 1 }).toArray();
+  var favourites = result[0].favourites;
+  favourites.push({ name: req.query.dishName })
+  await userCollection.updateOne({ username: username }, { $set: { favourites: favourites } });
+  console.log(req.query.dishName);
+  res.redirect(`/logpage`);
+});
 
 app.listen(port, () => {
-	console.log("Node application listening on port "+port);
+  console.log("Node application listening on port " + port);
 }); 
