@@ -65,7 +65,7 @@ app.get('/logpage', (req,res) => {
 
 
 
-
+app.use(express.static(__dirname + "/public"));
 
 app.listen(port, () => {
 	console.log("Node application listening on port "+port);
