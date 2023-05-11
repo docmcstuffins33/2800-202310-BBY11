@@ -30,7 +30,7 @@ app.set('view engine', 'ejs');
 
 app.get('/', (req,res) => {
     //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
-    res.send("Hello World!");
+    res.render('index');
 });
 
 // app.get('/dish/:id', function(req, res) {
@@ -50,8 +50,19 @@ app.get('/readMore', (req,res) => {
 });
 
 app.get('/search', (req,res) => {
-  res.render('search.ejs');
-})
+  res.render('search');
+});
+
+app.get('/logpage', (req,res) => {
+    const dishes = [
+        { name: 'Spaghetti Carbonara', description: 'Pasta with bacon and eggs' },
+        { name: 'Chicken Tikka Masala', description: 'Indian curry with chicken' },
+        { name: 'Caesar Salad', description: 'Salad with romaine lettuce and croutons' },
+      ];
+      
+    res.render('logPage', {dishes});
+  });
+
 
 
 
