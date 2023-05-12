@@ -77,6 +77,8 @@ app.get('/dish/:id', function (req, res) {
   var dishName = req.params.id;
   dishCollection.findOne({name: dishName}) // Fetch a single dish from the database
   .then(dish => {
+    req.session.history.push(dish);
+    userCollection.updateOne({username: username}, {$set: {history: req.session.history}});
     res.json(dish); // Send the dish as a JSON response
   })
   .catch(error => {
@@ -90,9 +92,11 @@ app.get('/dish/:id', function (req, res) {
 app.get('/dish', async (req, res) => {
   dishCollection.findOne() // Fetch a single dish from the database
     .then(dish => {
-      res.json(dish); // Send the dish as a JSON response
+      console.log(dish);
       req.session.history.push(dish);
-      userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
+      userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      res.json(dish); // Send the dish as a JSON response
+      
     })
     .catch(error => {
       console.error('Error:', error);
@@ -192,6 +196,7 @@ app.post('/signupSubmit', async (req, res) => {
 
   req.session.authenticated = true;
   req.session.username = username;
+  req.session.email = email;
   req.session.cookie.maxAge = expireTime;
   req.session.favourites = [];
   req.session.history = [];
@@ -229,10 +234,9 @@ app.post('/loginSubmit', async (req, res) => {
     req.session.authenticated = true;
     req.session.username = result[0].username;
     req.session.favourites = result[0].favourites;
-    req.session.history = result[0].favourites;
+    req.session.history = result[0].history;
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
-    req.session.user_type = result[0].user_type;
     res.redirect('/profile');
     return;
   }
