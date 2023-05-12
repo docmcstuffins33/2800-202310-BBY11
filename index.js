@@ -5,6 +5,7 @@ const express = require('express');
 const session = require('express-session');
 const MongoStore = require('connect-mongo');
 const bcrypt = require('bcrypt');
+const bodyParser = require('body-parser');
 const saltRounds = 12;
 
 const port = process.env.PORT || 3000;
@@ -40,7 +41,7 @@ const dishCollection = database.db(mongodb_database).collection("dishes");
 
 
 app.use(express.urlencoded({ extended: false }));
-
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.set('view engine', 'ejs');
 
@@ -188,6 +189,7 @@ app.post('/signupSubmit', async (req, res) => {
     password: hashedPassword,
     favourites: [],
     history: [],
+    dietaryRestrictions: []
   });
   console.log("Inserted user");
 
@@ -200,6 +202,7 @@ app.post('/signupSubmit', async (req, res) => {
   req.session.cookie.maxAge = expireTime;
   req.session.favourites = [];
   req.session.history = [];
+  req.session.dietaryRestrictions = [];
 
   res.redirect('/');
   return;
@@ -222,7 +225,7 @@ app.post('/loginSubmit', async (req, res) => {
   }
 
 
-  const result = await userCollection.find({ email: email }).project({ username: 1, email: 1, password: 1, favourites: 1, history: 1 }).toArray();
+  const result = await userCollection.find({ email: email }).project({ username: 1, email: 1, password: 1, favourites: 1, history: 1, dietaryRestrictions: 1 }).toArray();
 
   console.log(result);
   if (result.length != 1) {
@@ -235,6 +238,7 @@ app.post('/loginSubmit', async (req, res) => {
     req.session.username = result[0].username;
     req.session.favourites = result[0].favourites;
     req.session.history = result[0].history;
+    req.session.dietaryRestrictions = result[0].dietaryRestrictions;
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
     res.redirect('/profile');
@@ -264,9 +268,29 @@ app.get('/profile', async (req, res) => {
       username: req.session.username,
       users: result,
       email: req.session.email,
-      password: req.session.password
+      password: req.session.password,
+      dietaryRestriction: req.session.dietaryRestrictions
     });
   }
+});
+
+app.post('/dietarySave', async (req, res) => {
+  var dietaryRestriction = req.body.dietaryRestriction;
+  var drlist = req.session.dietaryRestrictions;
+
+  const schema = Joi.string().max(20).required();
+  const validationResult = schema.validate(dietaryRestriction);
+  if (validationResult.error != null) {
+    console.log(validationResult.error);
+    res.redirect("/profile");
+    return;
+  }
+
+  drlist.push(dietaryRestriction);
+  req.session.dietaryRestrictions = drlist;
+
+  await userCollection.updateOne({username: req.session.username}, {$set: {dietaryRestrictions: drlist}});
+  res.redirect('/profile');
 });
 
 app.get('/reset', (req, res) => {
