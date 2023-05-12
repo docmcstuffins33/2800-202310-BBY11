@@ -1,0 +1,22 @@
+<%- include("templates/header") %>
+
+  <div class="container">
+    <h2>Account Settings</h2>
+    <form action="/changepw" method="post">
+      <!-- <label for="newUsername">New Username:</label>
+  <input type="text" id="newUsername" name="newUsername" required><br> -->
+
+      <!-- <label for="newEmail">New Email:</label>
+  <input type="email" id="newEmail" name="newEmail" required><br> -->
+
+      <label for="currentPassword">Current Password:</label>
+      <input type="password" id="currentPassword" name="currentPassword" required><br>
+
+      <label for="newPassword">New Password:</label>
+      <input type="password" id="newPassword" name="newPassword"><br>
+
+      <button type="submit">Save Changes</button>
+    </form>
+  </div>
+
+  <%- include("templates/footer") %>

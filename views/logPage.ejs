@@ -1,0 +1,15 @@
+<%- include("templates/header") %>
+
+
+<div class="text-center">
+    <h1 style="font-family: 'Arial', sans-serif; color: #333; margin-top: 50px; margin-bottom: 30px;">History</h1>
+  </div>
+
+<div class="history">
+  <% for (let i = 0; i < dishes.length; i++) { %>
+    <%- include("templates/logCard", { dish: dishes[i], page: "logPage" }) %>
+  <% } %>
+</div>
+
+
+<%- include("templates/footer") %> 

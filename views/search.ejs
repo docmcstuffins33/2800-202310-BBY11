@@ -1,0 +1,138 @@
+<%- include("templates/header") %>
+
+
+<div class="container">
+    <div class="row">
+      <div class="text-center">
+        <button id="fetchDishButton" class="btn btn-secondary rounded-pill px-5 " data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Random Dish</button>
+      </div>
+    </div>
+</div>
+
+<div id="dishModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="container">
+    <h1 style="font-family: 'Arial', sans-serif; color: #333; margin-top: 50px; margin-bottom: 30px;">Filters</h1>
+    <div class="dropdown-center" style="margin-top: 10px;">
+      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Select
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Action</a></li>
+        <li><a class="dropdown-item" href="#">Action two</a></li>
+        <li><a class="dropdown-item" href="#">Action three</a></li>
+      </ul>
+    </div>
+  <br>
+    <div class="dropdown-center">
+      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Select
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Action</a></li>
+        <li><a class="dropdown-item" href="#">Action two</a></li>
+        <li><a class="dropdown-item" href="#">Action three</a></li>
+      </ul>
+    </div>
+
+    <br>
+    <div class="dropdown-center">
+      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Select
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Action</a></li>
+        <li><a class="dropdown-item" href="#">Action two</a></li>
+        <li><a class="dropdown-item" href="#">Action three</a></li>
+      </ul>
+    </div>
+
+    <br>
+    <div class="dropdown-center">
+      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Select
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Action</a></li>
+        <li><a class="dropdown-item" href="#">Action two</a></li>
+        <li><a class="dropdown-item" href="#">Action three</a></li>
+      </ul>
+    </div>
+
+    <br>
+    <div class="dropdown-center">
+      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        Select
+      </button>
+      <ul class="dropdown-menu">
+        <li><a class="dropdown-item" href="#">Action</a></li>
+        <li><a class="dropdown-item" href="#">Action two</a></li>
+        <li><a class="dropdown-item" href="#">Action three</a></li>
+      </ul>
+    </div>
+  </div>
+<br>
+  <div class="container">
+    <div class="row">
+      <div class="text-center">
+        <button class="btn btn-secondary rounded-pill px-5" type="button">Search</button>
+      </div>
+    </div>
+</div>
+
+  
+
+<script>
+  // JavaScript
+  const fetchDishButton = document.getElementById('fetchDishButton');
+  const modal = document.getElementById('dishModal');
+  fetchDishButton.addEventListener('click', fetchDish);
+
+  function fetchDish() {
+    fetch('/dish') // Assuming the server handles requests to '/dish' endpoint
+      .then(response => response.json())
+      .then(data => {
+        modal.innerHTML = `
+        <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+        <div class="modal-header border-bottom-0">
+          <h1 class="modal-title fs-5">${data.name}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-0">
+          <p>${data.description}</p>
+        </div>
+        <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+          <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+        </div>
+      </div>
+      </div>
+        `;
+  })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+</script>
+
+
+<%- include("templates/footer") %>
+

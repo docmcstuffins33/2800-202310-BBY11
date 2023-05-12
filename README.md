@@ -1,7 +1,8 @@
 # 2800-202310-BBY11
 BBY11 Project Repo
 
-Hi -Mylo
-HI -Jackson
+When cloning, remember to:
+ - Install all packages listed in package.json (-npm init, than -npm i <package>)
+ - Copy .env file if you don't have it
 
-end of Readme
+Project members: Olivia Li, Jackson Hu, Davin Leong, Mylo Yu

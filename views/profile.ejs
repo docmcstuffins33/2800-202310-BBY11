@@ -1,0 +1,52 @@
+<%- include("templates/header") %>
+
+<div class="container">
+  <h1>Hello, <%= username %></h1>
+
+  <div class="container-fluid">
+    <h3>User Information</h3>
+    <table class="table table-hover table-centered">
+      <thead>
+        <tr>
+          <th scope="col">Username</th>
+          <th scope="col">Email</th>
+          <th scope="col">Dietary Restriction(s)</th>
+        </tr>
+      </thead>
+      <tbody>
+          <tr>
+            <td>
+              <%= username %>
+            </td>
+            <td>
+              <%= email %>
+            </td>
+            <td>
+              <%= dietaryRestriction %>
+            </td>
+          </tr>
+      </tbody>
+    </table>
+    </body>
+  </div>
+
+  <form action="/dietarySave" method="post">
+    <input type="text" class="form-control" name="dietaryRestriction">
+    <button>Save</button>
+  </form>
+
+  <form action="/favourites" method="get">
+    <button>Favourites</button>
+  </form>
+
+  <form action="/reset" method="get">
+    <button>Reset Password</button>
+  </form>
+
+  <form action="/logout" method="get">
+    <button>Logout</button>
+  </form>
+
+</div>
+
+<%- include("templates/footer") %>
