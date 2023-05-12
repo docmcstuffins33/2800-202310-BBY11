@@ -74,11 +74,30 @@ app.get('/', (req, res) => {
 });
 
 app.get('/dish/:id', function (req, res) {
-  var dishId = req.params.id;
-  var dishName = dishId // Replace this with the database dish_id
+  var dishName = req.params.id;
+  dishCollection.findOne({name: dishName}) // Fetch a single dish from the database
+  .then(dish => {
+    res.json(dish); // Send the dish as a JSON response
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  });
 
-  //placeholders
-  res.render('dishCard', { dishName: dishName, description: "fooood..." });
+});
+
+// Endpoint to handle the dish request
+app.get('/dish', async (req, res) => {
+  dishCollection.findOne() // Fetch a single dish from the database
+    .then(dish => {
+      res.json(dish); // Send the dish as a JSON response
+      req.session.history.push(dish);
+      userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
+    });
 });
 
 
@@ -87,7 +106,11 @@ app.get('/dishcard', (req, res) => {
 });
 
 app.get('/readMore', (req, res) => {
-    res.render('readMorePage', {dish: req.query.dish});
+    var history = req.session.history;
+    console.log(history)
+    var dish = history.find(element => element.name == req.query.dish);
+    console.log(req.query.dish)
+    res.render('readMorePage', {dish: dish});
 });
 
 app.get('/search', (req, res) => {
@@ -115,7 +138,6 @@ app.get('/favourites', sessionValidation, (req, res) => {
   
     res.render('favourites', { dishes });
   });
-
 
 
 app.use(express.static(__dirname + "/public"));
@@ -160,8 +182,8 @@ app.post('/signupSubmit', async (req, res) => {
     username: username,
     email: email,
     password: hashedPassword,
-    favourites: "",
-    history: "",
+    favourites: [],
+    history: [],
   });
   console.log("Inserted user");
 
@@ -207,8 +229,7 @@ app.post('/loginSubmit', async (req, res) => {
     req.session.authenticated = true;
     req.session.username = result[0].username;
     req.session.favourites = result[0].favourites;
-    var dish = await dishCollection.find({ name: "amish  tomato ketchup  for canning" }).toArray();
-    req.session.history = [dish[0]];
+    req.session.history = result[0].favourites;
     req.session.email = email;
     req.session.cookie.maxAge = expireTime;
     req.session.user_type = result[0].user_type;
@@ -287,7 +308,6 @@ app.post('/changepw', async (req, res) => {
   //right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
 //add onto it, then update it
 app.post('/favourite', async (req,res) => {
-    console.log("hi");
     var history = req.session.history;
     var dish = history.find(element => element.name == req.query.dishName);
 
@@ -312,10 +332,13 @@ app.post('/favourite', async (req,res) => {
     }
     req.session.favourites = favourites;
     await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
-    res.redirect(`/${req.query.page}`);
+    res.redirect('back');
 });
 
-
+app.get("*", (req, res) => {
+  res.status(404);
+  res.render("errorMessage", {error: "Page Not Found"});
+})
 
 app.listen(port, () => {
   console.log("Node application listening on port " + port);

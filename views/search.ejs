@@ -1,16 +1,31 @@
 <%- include("templates/header") %>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/css/bootstrap.min.css" integrity="sha512-xyiJ6UuV7wTnmH+wPMVrFijrZMgFL7sT9G+Ls7NVxFg2sF7VwAJ+deuUJrYcTlTmGxHsX9u+gV03JQ95f8N3+Q==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.1.3/js/bootstrap.bundle.min.js" integrity="sha512-5x5qXfptJylK5GyIF5ibcBw10uvfi/i/JCvSJY2Z+xE7JRGtZY9M4SZv4ETW/GWy8+THC1DkFjKoZ97bESZD5Q==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
 
 <div class="container">
     <div class="row">
       <div class="text-center">
-        <button class="btn btn-secondary rounded-pill px-5" type="button">Random Dish</button>
+        <button id="fetchDishButton" class="btn btn-secondary rounded-pill px-5 " data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Random Dish</button>
       </div>
     </div>
+</div>
+
+<div id="dishModal" class="modal fade" tabindex="-1" role="dialog">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Modal title</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>Modal body text goes here.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 
@@ -86,8 +101,36 @@
   
 
 <script>
-const dropdownElementList = document.querySelectorAll('.dropdown-toggle')
-const dropdownList = [...dropdownElementList].map(dropdownToggleEl => new bootstrap.Dropdown(dropdownToggleEl))
+  // JavaScript
+  const fetchDishButton = document.getElementById('fetchDishButton');
+  const modal = document.getElementById('dishModal');
+  fetchDishButton.addEventListener('click', fetchDish);
+
+  function fetchDish() {
+    fetch('/dish') // Assuming the server handles requests to '/dish' endpoint
+      .then(response => response.json())
+      .then(data => {
+        modal.innerHTML = `
+        <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+        <div class="modal-header border-bottom-0">
+          <h1 class="modal-title fs-5">${data.name}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-0">
+          <p>${data.description}</p>
+        </div>
+        <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+          <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+        </div>
+      </div>
+      </div>
+        `;
+  })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
 </script>
 
 
