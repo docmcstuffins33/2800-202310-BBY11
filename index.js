@@ -52,6 +52,22 @@ app.use(session({
 }
 ));
 
+function isValidSession(req) {
+  if (req.session.authenticated) {
+      return true;
+  }
+  return false;
+}
+
+function sessionValidation(req,res,next) {
+  if (isValidSession(req)) {
+      next();
+  }
+  else {
+      res.redirect('/profile?redirectedPrompt=true');
+  }
+}
+
 app.get('/', (req, res) => {
   //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
   res.render('index');
@@ -78,7 +94,7 @@ app.get('/search', (req, res) => {
   res.render('search');
 });
 
-app.get('/logpage', (req, res) => {
+app.get('/logpage', sessionValidation, (req, res) => {
   var dishes = [];
   var history = req.session.history;
   for (let i = 0; i < history.length; i++) {
@@ -89,7 +105,7 @@ app.get('/logpage', (req, res) => {
   res.render('logPage', { dishes });
 });
 
-app.get('/favourites', (req, res) => {
+app.get('/favourites', sessionValidation, (req, res) => {
     var dishes = [];
     var favourites = req.session.favourites;
     for (let i = 0; i < favourites.length; i++) {
@@ -217,7 +233,7 @@ app.get('/profile', async (req, res) => {
   const result = await userCollection.find().project({ username: 1, email: 1, password: 1, favourites: 1}).toArray();
   if (!req.session.authenticated) {
     // res.redirect('/login');
-    res.render("profile_unauthenticated");
+    res.render("profile_unauthenticated", {redirectedPrompt : req.query.redirectedPrompt});
   } else {
     res.render("profile", { 
       username: req.session.username,
