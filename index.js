@@ -360,7 +360,7 @@ app.post('/favourite', async (req,res) => {
     }
     req.session.favourites = favourites;
     await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
-    res.redirect('back');
+    res.sendStatus(200);
 });
 
 app.get("*", (req, res) => {
