@@ -53,21 +53,30 @@ app.use(session({
 }
 ));
 
-function isValidSession(req) {
-  if (req.session.authenticated) {
-      return true;
+function sessionValidation(req,res,next) {
+  if(!req.session.authenticated) {
+    req.session.authenticated = true;
+    req.session.loggedIn = false;
+    req.session.history = [];
+    req.session.cookie.maxAge = expireTime;
   }
-  return false;
+  next();
 }
 
-function sessionValidation(req,res,next) {
-  if (isValidSession(req)) {
+function isLoggedIn(req) {
+  return (req.session.loggedIn);
+}
+
+function loginValidation(req,res,next) {
+  if (isLoggedIn(req)) {
       next();
   }
   else {
       res.redirect('/profile?redirectedPrompt=true');
   }
 }
+
+app.use('*', sessionValidation);
 
 app.get('/', (req, res) => {
   //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
@@ -95,7 +104,9 @@ app.get('/dish', async (req, res) => {
     .then(dish => {
       console.log(dish);
       req.session.history.push(dish);
-      userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      if(req.session.loggedIn) {
+        userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      }
       res.json(dish); // Send the dish as a JSON response
       
     })
@@ -122,7 +133,7 @@ app.get('/search', (req, res) => {
   res.render('search');
 });
 
-app.get('/logpage', sessionValidation, (req, res) => {
+app.get('/logpage', (req, res) => {
   var dishes = [];
   var history = req.session.history;
   for (let i = 0; i < history.length; i++) {
@@ -133,7 +144,7 @@ app.get('/logpage', sessionValidation, (req, res) => {
   res.render('logPage', { dishes });
 });
 
-app.get('/favourites', sessionValidation, (req, res) => {
+app.get('/favourites', loginValidation, (req, res) => {
     var dishes = [];
     var favourites = req.session.favourites;
     for (let i = 0; i < favourites.length; i++) {
@@ -188,7 +199,7 @@ app.post('/signupSubmit', async (req, res) => {
     email: email,
     password: hashedPassword,
     favourites: [],
-    history: [],
+    history: req.session.history,
     dietaryRestrictions: []
   });
   console.log("Inserted user");
@@ -196,12 +207,10 @@ app.post('/signupSubmit', async (req, res) => {
   // var html = "successfully created user";
   // res.send(html);
 
-  req.session.authenticated = true;
+  req.session.loggedIn= true;
   req.session.username = username;
   req.session.email = email;
-  req.session.cookie.maxAge = expireTime;
   req.session.favourites = [];
-  req.session.history = [];
   req.session.dietaryRestrictions = [];
 
   res.redirect('/');
@@ -234,13 +243,13 @@ app.post('/loginSubmit', async (req, res) => {
   }
   if (await bcrypt.compare(password, result[0].password)) {
     console.log("correct password");
-    req.session.authenticated = true;
+    req.session.loggedIn= true;
     req.session.username = result[0].username;
     req.session.favourites = result[0].favourites;
-    req.session.history = result[0].history;
+    req.session.history = result[0].history.concat(req.session.history);
+    userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
     req.session.dietaryRestrictions = result[0].dietaryRestrictions;
     req.session.email = email;
-    req.session.cookie.maxAge = expireTime;
     res.redirect('/profile');
     return;
   }
@@ -255,13 +264,12 @@ app.get('/logout', (req, res) => {
   // var html = `
   //   You are logged out.
   //   `;
-  res.redirect('/login');
+  res.redirect('/');
 });
 
 app.get('/profile', async (req, res) => {
   const result = await userCollection.find().project({ username: 1, email: 1, password: 1, favourites: 1}).toArray();
-  if (!req.session.authenticated) {
-    // res.redirect('/login');
+  if (!req.session.loggedIn) {
     res.render("profile_unauthenticated", {redirectedPrompt : req.query.redirectedPrompt});
   } else {
     res.render("profile", { 
@@ -335,7 +343,7 @@ app.post('/changepw', async (req, res) => {
 
   //right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
 //add onto it, then update it
-app.post('/favourite', async (req,res) => {
+app.post('/favourite', loginValidation, async (req,res) => {
     var history = req.session.history;
     var dish = history.find(element => element.name == req.query.dishName);
 
