@@ -129,7 +129,7 @@ app.get('/readMore', (req, res) => {
     console.log(history)
     var dish = history.find(element => element.name == req.query.dish);
     console.log(req.query.dish)
-    res.render('readMorePage', {dish: dish});
+    res.render('readMorePage', {dish: dish, loggedIn: req.session.loggedIn});
 });
 
 app.get('/search', (req, res) => {
@@ -144,7 +144,7 @@ app.get('/logpage', (req, res) => {
   }
 
 
-  res.render('logPage', { dishes });
+  res.render('logPage', { dishes, loggedIn: req.session.loggedIn });
 });
 
 app.get('/favourites', loginValidation, (req, res) => {
