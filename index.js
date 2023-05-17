@@ -155,7 +155,7 @@ app.get('/favourites', loginValidation, (req, res) => {
     }
   
   
-    res.render('favourites', { dishes });
+    res.render('favourites', { dishes, loggedIn: req.session.loggedIn });
   });
 
 
@@ -350,6 +350,10 @@ app.post('/favourite', loginValidation, async (req,res) => {
     var history = req.session.history;
     var dish = history.find(element => element.name == req.query.dishName);
 
+    if(dish.numFavs == undefined) {
+      dish.numFavs = 0;
+    } 
+
     var favourites = req.session.favourites;
     var username = req.session.username;
 
@@ -357,20 +361,24 @@ app.post('/favourite', loginValidation, async (req,res) => {
 
     var removed = false;
 
-    if(favourites == "") {
-        favourites = [];
-    }
+    // if(favourites == "") {
+    //     favourites = [];
+    // }
+
     for(i = 0; i < favourites.length; i++) {
         if(dish.name == favourites[i].name) {
             favourites.splice(i, 1);
             removed = true;
+            dish.numFavs = dish.numFavs-1;
         }
     }
     if(!removed){
         favourites.push(dish);
+        dish.numFavs = dish.numFavs+1;
     }
     req.session.favourites = favourites;
     await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
+    await dishCollection.updateOne({id: dish.id}, {$set: {numFavs: dish.numFavs}});
     res.sendStatus(200);
 });
 
