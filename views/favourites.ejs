@@ -6,7 +6,7 @@
   </div>
 
 <div class="favourites">
-  <% for (let i = 0; i < dishes.length; i++) { %>
+  <% for (let i = dish.length-1; i > -1; i--) { %>
     <%- include("templates/logCard", { dish: dishes[i], page: "favourites" }) %>
   <% } %>
 </div>

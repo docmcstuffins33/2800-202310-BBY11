@@ -15,6 +15,8 @@ const Joi = require("joi");
 
 const expireTime = 60 * 60 * 1000; //expires after 1 hour  (minutes * seconds * millis)
 
+const numDishes = 231637;
+
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
@@ -100,7 +102,8 @@ app.get('/dish/:id', function (req, res) {
 
 // Endpoint to handle the dish request
 app.get('/dish', async (req, res) => {
-  dishCollection.findOne() // Fetch a single dish from the database
+  var dishId = Math.floor(Math.random() * numDishes);
+  dishCollection.findOne({'id': dishId}) // Fetch a single dish from the database
     .then(dish => {
       console.log(dish);
       req.session.history.push(dish);
