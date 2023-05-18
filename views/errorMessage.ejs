@@ -1,7 +1,21 @@
 <%- include("templates/header") %>
 
 <div class="container">
-    <h2><%= error %></h2>
+    <div class="position-absolute top-50 start-50 translate-middle text-center">
+        <img src="/images/cat_staring.gif" id="cat" play="false">
+        <h2><%= error %>!</h2>
+    </div>
 </div>
+
+
+<script>
+     const cat = document.getElementById('cat');
+    cat.addEventListener('click', meow);
+
+    function meow() {
+        var meow = new Audio('/sounds/meow.mp3')
+        meow.play();
+    }
+</script>
 
 <%- include("templates/footer") %>
