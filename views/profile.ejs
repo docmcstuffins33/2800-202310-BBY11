@@ -22,6 +22,7 @@
           <th scope="col">Username</th>
           <th scope="col">Email</th>
           <th scope="col">Dietary Restriction(s)</th>
+          <th scope="col">Food Allergy(s)</th>
         </tr>
       </thead>
       <tbody>
@@ -33,18 +34,62 @@
               <%= email %>
             </td>
             <td>
-              <%= dietaryRestriction %>
+              <% dietaryRestriction.forEach(function(item) { %>
+                <p><%= item %></p>
+              <% }); %>
+              <form method="POST" action="/saveDietaryRestriction">
+                <!-- Dropdown menu code -->
+                <select name="dietaryRestriction">
+                  <!-- Options for the dropdown -->
+                  <option value="">Select a dietary restriction</option>
+                  <option value="Vegetarian">Vegetarian</option>
+                  <option value="Vegan">Vegan</option>
+                  <option value="Pescatarian">Pescatarian</option>
+                  <option value="Gluten-free">Gluten-free</option>
+                  <option value="Dairy-free">Dairy-free</option>
+                  <!-- Add more options as needed -->
+                </select>
+                <button type="submit">Add</button>
+              </form>
+            </td>
+            <td>
+              <form action="/allergySave" method="post">
+                <input type="text" class="form-control" name="foodAllergy" id="foodAllergy">
+                <button>Save</button>
+              </form>
             </td>
           </tr>
       </tbody>
     </table>
-    </body>
   </div>
 
-  <form action="/dietarySave" method="post">
-    <input type="text" class="form-control" name="dietaryRestriction">
-    <button>Save</button>
-  </form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>   
+
+<script>
+  $(function() {
+    $("#foodAllergy").autocomplete({
+      source: function(request, response) {
+        $.ajax({
+          url: "/ingredients", // Endpoint URL
+          method: "GET",
+          data: {
+            query: request.term
+          },
+          success: function(data) {
+            response(data);
+          }
+        });
+      },
+      minLength: 1, // Minimum input length to trigger autocomplete
+      select: function(event, ui) {
+        $("#foodAllergy").val(ui.item.value); // Set the selected value in the input field
+        return false;
+      }
+    });
+  });
+</script>
+
 
   <form action="/favourites" method="get">
     <button>Favourites</button>

@@ -285,9 +285,102 @@ app.get('/profile', async (req, res) => {
   }
 });
 
-app.post('/dietarySave', async (req, res) => {
+app.post('/saveDietaryRestriction', async (req, res) => {
   var dietaryRestriction = req.body.dietaryRestriction;
+  var excludedIngredients = [];
+
+  // Check the dietary restriction and assign the corresponding excluded ingredients list
+  if (dietaryRestriction === 'Vegetarian') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      "Turkey",
+      "Duck",
+      "Fish",
+      "Salmon",
+      "Shrimp",
+      "Tuna",
+      "Crab",
+      "Lobster",
+      "Gelatin",
+      "Animal fats",
+      "Lard",
+      "Suet",
+      "Tallow",
+      "broth",
+      "Rennet",
+      "Cochineal",
+      "Isinglass"
+      // Add other vegetarian-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Vegan') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      "Turkey",
+      "Duck",
+      "Fish",
+      "Salmon",
+      "Shrimp",
+      "Tuna",
+      "Crab",
+      "Lobster",
+      "Gelatin",
+      "Animal fats",
+      "Lard",
+      "Suet",
+      "Tallow",
+      "broth",
+      "Rennet",
+      "Cochineal",
+      "Isinglass",
+      "milk",
+      "cheese",
+      "yogurt",
+      "butter",
+      "cream",
+      "whey"
+      // Add other vegan-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Pescatarian') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      // Add other pescatarian-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Gluten-Free') {
+    excludedIngredients = [
+      "Wheat",
+      "Barley",
+      "Rye",
+      "Oats",
+      "Yeast",
+      "Flour",
+      "Bran",
+      "Farina",
+      "Starch",
+      "Bran"
+    ];
+  } else if (dietaryRestriction === 'Dairy-Free') {
+    excludedIngredients = [
+      "milk",
+      "cheese",
+      "yogurt",
+      "butter",
+      "cream",
+      "whey"
+    ];
+  }
+
   var drlist = req.session.dietaryRestrictions;
+
+  console.log(dietaryRestriction);
 
   const schema = Joi.string().max(20).required();
   const validationResult = schema.validate(dietaryRestriction);
@@ -300,7 +393,46 @@ app.post('/dietarySave', async (req, res) => {
   drlist.push(dietaryRestriction);
   req.session.dietaryRestrictions = drlist;
 
-  await userCollection.updateOne({username: req.session.username}, {$set: {dietaryRestrictions: drlist}});
+  // Update the user's dietary restrictions and excluded ingredients in the database
+  await userCollection.updateOne(
+    { username: req.session.username },
+    { $set: { dietaryRestrictions: drlist, excludedIngredients: excludedIngredients } }
+  );
+
+  res.redirect('/profile');
+});
+
+
+
+app.get('/ingredients', async (req, res) => {
+  try {
+    const ingredients = await dishCollection.distinct("ingredients");
+    res.json(ingredients);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+app.post('/allergySave', async (req, res) => {
+  var allergy = req.body.foodAllergy;
+  var allergylist = req.session.allergies || [];
+
+  console.log(allergy);
+
+  const schema = Joi.string().max(20).required();
+  const validationResult = schema.validate(allergy);
+  if (validationResult.error != null) {
+    console.log(validationResult.error);
+    res.redirect("/profile");
+    return;
+  }
+
+  allergylist.push(allergy);
+  req.session.allergies = allergylist;
+
+  await userCollection.updateOne({ username: req.session.username }, { $set: { allergies: allergylist } });
   res.redirect('/profile');
 });
 
