@@ -120,8 +120,16 @@ app.get('/dish', async (req, res) => {
 });
 
 app.get('/searchDish', async (req,res) => {
-  var searchString = "honey"
-  var dishes = await dishCollection.find({'ingredients': { $in: ["honey"]}}).toArray();
+
+  var ingredients = ["honey", "cinnamon", "brown sugar", "chocolate"];
+
+  const conditions = ingredients.map(value => ({
+    'ingredients': { $in: [new RegExp(value, "i")]}
+  }));
+
+  const query = { $and: conditions};
+
+  var dishes = await dishCollection.find(query).toArray();
       var dishNum = Math.floor(Math.random() * dishes.length);
       console.log(dishes.length);
       var dish = dishes[dishNum];
