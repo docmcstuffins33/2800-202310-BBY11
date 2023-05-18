@@ -1,0 +1,48 @@
+body {
+  background-color: black;
+}
+
+.container {
+  background-color: #FFF8D6;
+}
+
+p {
+  color: #333333;
+}
+
+@media (max-width: 576px) {
+  .btn {
+    font-size: 25px;
+    padding: 24px 56px;
+    /* margin:20px; */
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 100%;
+  }
+}
+
+  .btn {
+    font-size: 25px;
+    /* padding: 24px 56px; */
+    /* margin-left: auto;
+    margin-right: auto; */
+    display: block;
+    /* width: 100%; */
+  }
+
+  .btn-primary {
+    background-color:#40513B !important;
+  }
+
+  hr.divider {
+    height: 0.2rem;
+    max-width: 3.25rem;
+    margin: 1.5rem auto;
+    background-color: #f4623a;
+    opacity: 1;
+  }
+
+  hr.divider-light {
+    background-color: #FFC800 ;
+  }

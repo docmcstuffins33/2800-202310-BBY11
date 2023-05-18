@@ -1,6 +1,10 @@
 <%- include("templates/header") %>
 
-<link rel="stylesheet" href="/css/style.css">
+<% if (darkMode) { %>
+  <link rel="stylesheet" type="text/css" href="/css/dark-style.css">
+<% } else { %>
+  <link rel="stylesheet" type="text/css" href="/css/style.css">
+<% } %>
 
 
   <section class="page-section" id="about">

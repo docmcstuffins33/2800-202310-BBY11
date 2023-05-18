@@ -28,6 +28,8 @@ const mongodb_session_secret = process.env.MONGODB_SESSION_SECRET;
 
 const node_session_secret = process.env.NODE_SESSION_SECRET;
 
+const darkMode = false;
+
 
 var mongoStore = MongoStore.create({
   mongoUrl: `mongodb+srv://${mongodb_user}:${mongodb_password}@${mongodb_host}/sessions`,
@@ -55,12 +57,13 @@ app.use(session({
 }
 ));
 
-function sessionValidation(req,res,next) {
-  if(!req.session.authenticated) {
+function sessionValidation(req, res, next) {
+  if (!req.session.authenticated) {
     req.session.authenticated = true;
     req.session.loggedIn = false;
     req.session.history = [];
     req.session.cookie.maxAge = expireTime;
+    req.session.darkMode = false; // Set initial dark mode value to false
   }
   next();
 }
@@ -82,7 +85,7 @@ app.use('*', sessionValidation);
 
 app.get('/', (req, res) => {
   //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
-  res.render('index');
+  res.render('index', { darkMode });
 });
 
 app.get('/dish/:id', function (req, res) {
@@ -512,6 +515,11 @@ app.post('/favourite', loginValidation, async (req,res) => {
     await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
     await dishCollection.updateOne({id: dish.id}, {$set: {numFavs: dish.numFavs}});
     res.sendStatus(200);
+});
+
+app.get('/darkmode', (req, res) => {
+  req.session.darkMode = !req.session.darkMode; // Toggle dark mode
+  res.redirect('back'); // Redirect back to the previous page
 });
 
 app.get("*", (req, res) => {
