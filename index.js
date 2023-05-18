@@ -119,6 +119,20 @@ app.get('/dish', async (req, res) => {
     });
 });
 
+app.get('/searchDish', async (req,res) => {
+  var searchString = "honey"
+  var dishes = await dishCollection.find({'ingredients': { $in: ["honey"]}}).toArray();
+      var dishNum = Math.floor(Math.random() * dishes.length);
+      console.log(dishes.length);
+      var dish = dishes[dishNum];
+      console.log(dish);
+      req.session.history.push(dish);
+      if(req.session.loggedIn) {
+        userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      }
+      res.json(dish); // Send the dish as a JSON response
+})
+
 
 app.get('/dishcard', (req, res) => {
   res.render('dishCard');

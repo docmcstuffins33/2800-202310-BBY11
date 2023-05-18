@@ -247,7 +247,7 @@ h1 {
 
   <div class="row justify-content-center">
     <div class="col-md-6 text-center">
-      <button class="btn btn-secondary rounded-pill px-5" type="button">Search</button>
+      <button id="searchButton" class="btn btn-secondary rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Search</button>
     </div>
   </div>
 </div>
@@ -258,11 +258,39 @@ h1 {
 <script>
   // JavaScript
   const fetchDishButton = document.getElementById('fetchDishButton');
+  const searchButton = document.getElementById('searchButton');
   const modal = document.getElementById('dishModal');
-  fetchDishButton.addEventListener('click', fetchDish);
+  fetchDishButton.addEventListener('click', fetchRandomDish);
+  searchButton.addEventListener('click', fetchSearchedDish);
 
-  function fetchDish() {
+  function fetchRandomDish() {
     fetch('/dish') // Assuming the server handles requests to '/dish' endpoint
+      .then(response => response.json())
+      .then(data => {
+        modal.innerHTML = `
+        <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+        <div class="modal-header border-bottom-0">
+          <h1 class="modal-title fs-5">${data.name}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-0">
+          <p>${data.description}</p>
+        </div>
+        <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+          <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+        </div>
+      </div>
+      </div>
+        `;
+  })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+
+  function fetchSearchedDish() {
+    fetch('/searchDish') // Assuming the server handles requests to '/dish' endpoint
       .then(response => response.json())
       .then(data => {
         modal.innerHTML = `
