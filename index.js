@@ -121,15 +121,26 @@ app.get('/dish', async (req, res) => {
 
 app.get('/searchDish', async (req,res) => {
 
-  var ingredients = ["honey", "cinnamon", "brown sugar", "chocolate"];
+  var timeToCook = 5;
 
-  const conditions = ingredients.map(value => ({
+  var stepComplexity = "easy";
+
+  var ingredientAmount = "" + 10;
+
+  var ingredients = ["honey"];
+
+  var conditions = ingredients.map(value => ({
     'ingredients': { $in: [new RegExp(value, "i")]}
   }));
+
+  conditions.push({ $expr: { $lte: [ { $toInt: '$minutes' }, timeToCook ] } });
 
   const query = { $and: conditions};
 
   var dishes = await dishCollection.find(query).toArray();
+  if (dishes.length == 0) {
+    res.status(204).json({'error': 1})
+  } else {
       var dishNum = Math.floor(Math.random() * dishes.length);
       console.log(dishes.length);
       var dish = dishes[dishNum];
@@ -139,6 +150,7 @@ app.get('/searchDish', async (req,res) => {
         userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
       }
       res.json(dish); // Send the dish as a JSON response
+    }
 })
 
 

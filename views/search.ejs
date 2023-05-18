@@ -265,7 +265,7 @@ h1 {
 
   function fetchRandomDish() {
     fetch('/dish') // Assuming the server handles requests to '/dish' endpoint
-      .then(response => response.json())
+      .then(response => response.json)
       .then(data => {
         modal.innerHTML = `
         <div class="modal-dialog" role="document">
@@ -291,8 +291,27 @@ h1 {
 
   function fetchSearchedDish() {
     fetch('/searchDish') // Assuming the server handles requests to '/dish' endpoint
-      .then(response => response.json())
+      .then(response => { 
+        if(response.status === 204) {
+        return;
+      }
+      else if(response.ok) {
+        return response.json()
+      }})
       .then(data => {
+        if(!data) {
+          modal.innerHTML = `
+          <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+        <div class="modal-header border-bottom-0">
+          <h1 class="modal-title fs-5">No Results Found</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      </div>
+        `;
+          return;
+        }
         modal.innerHTML = `
         <div class="modal-dialog" role="document">
         <div class="modal-content rounded-4 shadow">
