@@ -123,9 +123,9 @@ app.get('/searchDish', async (req,res) => {
 
   var timeToCook = 5;
 
-  var stepComplexity = "easy";
+  var stepAmount = 5;
 
-  var ingredientAmount = "" + 10;
+  var ingredientAmount = 10;
 
   var ingredients = ["honey"];
 
@@ -134,6 +134,8 @@ app.get('/searchDish', async (req,res) => {
   }));
 
   conditions.push({ $expr: { $lte: [ { $toInt: '$minutes' }, timeToCook ] } });
+  conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, stepAmount ] } });
+  conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, ingredientAmount] } });
 
   const query = { $and: conditions};
 
