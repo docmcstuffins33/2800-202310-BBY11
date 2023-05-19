@@ -128,9 +128,22 @@
           <p class="card-text">Number of favourites: <%= dish.numFavs %></p>
           <% } %>
           <p class="card-text">Description: <%= dish.description %></p>
-          <p class="card-text">Ingredients: <%= dish.ingredients %></p>
-          <p class="card-text">Steps: <%= dish.steps %></p>
-          <button type="submit" id="submit-icon">Image</button>
+          <p class="card-text">
+            <ul> Ingredients: 
+              <% let i=0; %>
+              <% for(i=0; i < dish.ingredients.length; i++) { %>
+                  <li><%= dish.ingredients[i] %></li>
+              <% } %> 
+          </ul>
+        </p>
+          <p class="card-text">
+            <ol>
+              Steps:               
+              <% for(i=0; i < dish.steps.length; i++) { %>
+                  <li><%= dish.steps[i] %></li>
+              <% } %> 
+            </ol>
+          </p>
           <section class="image-section"></section>
         </div>
       </div>
@@ -144,7 +157,7 @@
   const dishTitle = document.getElementById("dishTitle");
   favouriteButton.addEventListener("click", callFavourite);
 
-  const api_key = process.env.API_KEY;
+  const api_key = API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2FmNDkyMmUtOTVlNS00MzA2LTllYWQtM2Y3OGE3OTk4MjVkIiwidHlwZSI6ImFwaV90b2tlbiJ9.2i4A4Yvt63SD9GWS6-RHxj5bybWMPkKErvUyKyzyZZU";
   const submitIcon = document.querySelector('#submit-icon');
   const inputElement = document.getElementById("dishTitle"); 
   const imageSection = document.querySelector('.image-section');
@@ -184,23 +197,21 @@
     try {
       const response = await fetch('https://api.edenai.run/v2/image/generation', options)
       const data = await response.json();
-      console.log(data);
+      console.log(data.openai.items[0].image_resource_url);
       
       // putting the image into the page
 
-      // data?.data.forEach(imageObject => {
-      //   const imageContainer = document.createElement('div');
-      //   imageContainer.classList.add('image-container');
-      //   const imageElement = document.createElement('img');
-      //   imageElement.setAttribute('src', imageObject.url);
-      //   imageContainer.append(imageElement);
-      //   imageSection.append(imageContainer);
-      // })
+        const imageContainer = document.createElement('div');
+        imageContainer.classList.add('image-container');
+        const imageElement = document.createElement('img');
+        imageElement.setAttribute('src', data.openai.items[0].image_resource_url);
+        imageContainer.append(imageElement);
+        imageSection.append(imageContainer);
     } catch (error) {
       console.error(error);
     }
   }
-  submitIcon.addEventListener("click", getImages);
+  $(document).ready(getImages);
 
 </script>
 
