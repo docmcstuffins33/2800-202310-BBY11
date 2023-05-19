@@ -130,6 +130,8 @@
           <p class="card-text">Description: <%= dish.description %></p>
           <p class="card-text">Ingredients: <%= dish.ingredients %></p>
           <p class="card-text">Steps: <%= dish.steps %></p>
+          <button type="submit" id="submit-icon">Image</button>
+          <section class="image-section"></section>
         </div>
       </div>
     </div>
@@ -141,6 +143,11 @@
   const favouriteButton = document.getElementById("favourite");
   const dishTitle = document.getElementById("dishTitle");
   favouriteButton.addEventListener("click", callFavourite);
+
+  const api_key = process.env.API_KEY;
+  const submitIcon = document.querySelector('#submit-icon');
+  const inputElement = document.getElementById("dishTitle"); 
+  const imageSection = document.querySelector('.image-section');
 
   function callFavourite() {
     $.ajax({
@@ -155,6 +162,46 @@
       },
     });
   }
+
+  const getImages = async () => {
+    const options = {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${api_key}`,
+        accept: 'application/json',
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        providers: 'openai',
+        response_as_dict: true,
+        attributes_as_list: false,
+        show_original_response: false,
+        resolution: '256x256',
+        num_images: 1,
+        text: inputElement.innerHTML,
+      })
+    }
+    try {
+      const response = await fetch('https://api.edenai.run/v2/image/generation', options)
+      const data = await response.json();
+      console.log(data);
+      
+      // putting the image into the page
+
+      // data?.data.forEach(imageObject => {
+      //   const imageContainer = document.createElement('div');
+      //   imageContainer.classList.add('image-container');
+      //   const imageElement = document.createElement('img');
+      //   imageElement.setAttribute('src', imageObject.url);
+      //   imageContainer.append(imageElement);
+      //   imageSection.append(imageContainer);
+      // })
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  submitIcon.addEventListener("click", getImages);
+
 </script>
 
 <%- include("templates/footer") %>
