@@ -12,8 +12,13 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 const Joi = require("joi");
+const { time } = require("console");
 
 const expireTime = 60 * 60 * 1000; //expires after 1 hour  (minutes * seconds * millis)
+
+const numDishes = 231637;
+
+var meow = false;
 
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
@@ -41,7 +46,7 @@ const dishCollection = database.db(mongodb_database).collection("dishes");
 
 
 app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.set('view engine', 'ejs');
 
@@ -53,15 +58,22 @@ app.use(session({
 }
 ));
 
-function isValidSession(req) {
-  if (req.session.authenticated) {
-      return true;
+function sessionValidation(req,res,next) {
+  if(!req.session.authenticated) {
+    req.session.authenticated = true;
+    req.session.loggedIn = false;
+    req.session.history = [];
+    req.session.cookie.maxAge = expireTime;
   }
-  return false;
+  next();
 }
 
-function sessionValidation(req,res,next) {
-  if (isValidSession(req)) {
+function isLoggedIn(req) {
+  return (req.session.loggedIn);
+}
+
+function loginValidation(req,res,next) {
+  if (isLoggedIn(req)) {
       next();
   }
   else {
@@ -69,9 +81,11 @@ function sessionValidation(req,res,next) {
   }
 }
 
+app.use('*', sessionValidation);
+
 app.get('/', (req, res) => {
   //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
-  res.render('index');
+  res.render('search');
 });
 
 app.get('/dish/:id', function (req, res) {
@@ -91,11 +105,14 @@ app.get('/dish/:id', function (req, res) {
 
 // Endpoint to handle the dish request
 app.get('/dish', async (req, res) => {
-  dishCollection.findOne() // Fetch a single dish from the database
+  var dishId = Math.floor(Math.random() * numDishes);
+  dishCollection.findOne({'id': dishId}) // Fetch a single dish from the database
     .then(dish => {
       console.log(dish);
       req.session.history.push(dish);
-      userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      if(req.session.loggedIn) {
+        userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      }
       res.json(dish); // Send the dish as a JSON response
       
     })
@@ -104,6 +121,73 @@ app.get('/dish', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     });
 });
+
+app.get('/easterEggCheck', async (req,res) => {
+  console.log(meow)
+  var cat = meow;
+  const response = {cat: cat};
+  res.json(response);
+})
+
+app.get('/meow', async (req,res) => {
+  console.log(meow);
+  if(meow) {
+    meow = false;
+  } else {
+    meow = true;
+  }
+  console.log(meow);
+  console.log("meow");
+  req.session.save();
+  res.send("all good :3");
+})
+
+app.post('/searchDish', async (req,res) => {
+
+  var timeToCook = req.body.minutes;
+
+  var complexity = req.body.complexity
+
+  var ingredients = req.body.ingredients
+
+  console.log(req.body)
+
+  var conditions = ingredients.map(value => ({
+    'ingredients': { $in: [new RegExp(value, "i")]}
+  }));
+
+  conditions.push({ $expr: { $lte: [ { $toInt: '$minutes' }, timeToCook ] } });
+
+  if(complexity == "easy") {
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 6 ] } });
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 6] } });
+  }
+  if(complexity == "medium") {
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 11 ] } });
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 8] } });
+  }
+  if(complexity == "complex") {
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_steps' }, 10 ] } });
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_ingredients' }, 9] } });
+  }
+
+  const query = { $and: conditions};
+
+  var dishes = await dishCollection.find(query).toArray();
+  if (dishes.length == 0) {
+    res.status(204).json({'error': 1})
+  } else {
+      var dishNum = Math.floor(Math.random() * dishes.length);
+      console.log(dishes.length);
+      var dish = dishes[dishNum];
+      console.log(dish);
+      req.session.history.push(dish);
+      if(req.session.loggedIn) {
+        userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      }
+      res.json(dish); // Send the dish as a JSON response
+    }
+})
 
 
 app.get('/dishcard', (req, res) => {
@@ -115,14 +199,14 @@ app.get('/readMore', (req, res) => {
     console.log(history)
     var dish = history.find(element => element.name == req.query.dish);
     console.log(req.query.dish)
-    res.render('readMorePage', {dish: dish});
+    res.render('readMorePage', {dish: dish, loggedIn: req.session.loggedIn});
 });
 
 app.get('/search', (req, res) => {
   res.render('search');
 });
 
-app.get('/logpage', sessionValidation, (req, res) => {
+app.get('/logpage', (req, res) => {
   var dishes = [];
   var history = req.session.history;
   for (let i = 0; i < history.length; i++) {
@@ -130,10 +214,10 @@ app.get('/logpage', sessionValidation, (req, res) => {
   }
 
 
-  res.render('logPage', { dishes });
+  res.render('logPage', { dishes, loggedIn: req.session.loggedIn });
 });
 
-app.get('/favourites', sessionValidation, (req, res) => {
+app.get('/favourites', loginValidation, (req, res) => {
     var dishes = [];
     var favourites = req.session.favourites;
     for (let i = 0; i < favourites.length; i++) {
@@ -141,7 +225,7 @@ app.get('/favourites', sessionValidation, (req, res) => {
     }
   
   
-    res.render('favourites', { dishes });
+    res.render('favourites', { dishes, loggedIn: req.session.loggedIn });
   });
 
 
@@ -188,7 +272,7 @@ app.post('/signupSubmit', async (req, res) => {
     email: email,
     password: hashedPassword,
     favourites: [],
-    history: [],
+    history: req.session.history,
     dietaryRestrictions: []
   });
   console.log("Inserted user");
@@ -196,12 +280,10 @@ app.post('/signupSubmit', async (req, res) => {
   // var html = "successfully created user";
   // res.send(html);
 
-  req.session.authenticated = true;
+  req.session.loggedIn= true;
   req.session.username = username;
   req.session.email = email;
-  req.session.cookie.maxAge = expireTime;
   req.session.favourites = [];
-  req.session.history = [];
   req.session.dietaryRestrictions = [];
 
   res.redirect('/');
@@ -234,13 +316,13 @@ app.post('/loginSubmit', async (req, res) => {
   }
   if (await bcrypt.compare(password, result[0].password)) {
     console.log("correct password");
-    req.session.authenticated = true;
+    req.session.loggedIn= true;
     req.session.username = result[0].username;
     req.session.favourites = result[0].favourites;
-    req.session.history = result[0].history;
+    req.session.history = result[0].history.concat(req.session.history);
+    userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
     req.session.dietaryRestrictions = result[0].dietaryRestrictions;
     req.session.email = email;
-    req.session.cookie.maxAge = expireTime;
     res.redirect('/profile');
     return;
   }
@@ -255,13 +337,12 @@ app.get('/logout', (req, res) => {
   // var html = `
   //   You are logged out.
   //   `;
-  res.redirect('/login');
+  res.redirect('/');
 });
 
 app.get('/profile', async (req, res) => {
   const result = await userCollection.find().project({ username: 1, email: 1, password: 1, favourites: 1}).toArray();
-  if (!req.session.authenticated) {
-    // res.redirect('/login');
+  if (!req.session.loggedIn) {
     res.render("profile_unauthenticated", {redirectedPrompt : req.query.redirectedPrompt});
   } else {
     res.render("profile", { 
@@ -274,9 +355,102 @@ app.get('/profile', async (req, res) => {
   }
 });
 
-app.post('/dietarySave', async (req, res) => {
+app.post('/saveDietaryRestriction', async (req, res) => {
   var dietaryRestriction = req.body.dietaryRestriction;
+  var excludedIngredients = [];
+
+  // Check the dietary restriction and assign the corresponding excluded ingredients list
+  if (dietaryRestriction === 'Vegetarian') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      "Turkey",
+      "Duck",
+      "Fish",
+      "Salmon",
+      "Shrimp",
+      "Tuna",
+      "Crab",
+      "Lobster",
+      "Gelatin",
+      "Animal fats",
+      "Lard",
+      "Suet",
+      "Tallow",
+      "broth",
+      "Rennet",
+      "Cochineal",
+      "Isinglass"
+      // Add other vegetarian-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Vegan') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      "Turkey",
+      "Duck",
+      "Fish",
+      "Salmon",
+      "Shrimp",
+      "Tuna",
+      "Crab",
+      "Lobster",
+      "Gelatin",
+      "Animal fats",
+      "Lard",
+      "Suet",
+      "Tallow",
+      "broth",
+      "Rennet",
+      "Cochineal",
+      "Isinglass",
+      "milk",
+      "cheese",
+      "yogurt",
+      "butter",
+      "cream",
+      "whey"
+      // Add other vegan-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Pescatarian') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      // Add other pescatarian-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Gluten-Free') {
+    excludedIngredients = [
+      "Wheat",
+      "Barley",
+      "Rye",
+      "Oats",
+      "Yeast",
+      "Flour",
+      "Bran",
+      "Farina",
+      "Starch",
+      "Bran"
+    ];
+  } else if (dietaryRestriction === 'Dairy-Free') {
+    excludedIngredients = [
+      "milk",
+      "cheese",
+      "yogurt",
+      "butter",
+      "cream",
+      "whey"
+    ];
+  }
+
   var drlist = req.session.dietaryRestrictions;
+
+  console.log(dietaryRestriction);
 
   const schema = Joi.string().max(20).required();
   const validationResult = schema.validate(dietaryRestriction);
@@ -289,7 +463,46 @@ app.post('/dietarySave', async (req, res) => {
   drlist.push(dietaryRestriction);
   req.session.dietaryRestrictions = drlist;
 
-  await userCollection.updateOne({username: req.session.username}, {$set: {dietaryRestrictions: drlist}});
+  // Update the user's dietary restrictions and excluded ingredients in the database
+  await userCollection.updateOne(
+    { username: req.session.username },
+    { $set: { dietaryRestrictions: drlist, excludedIngredients: excludedIngredients } }
+  );
+
+  res.redirect('/profile');
+});
+
+
+
+app.get('/ingredients', async (req, res) => {
+  try {
+    const ingredients = await dishCollection.distinct("ingredients");
+    res.json(ingredients);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+app.post('/allergySave', async (req, res) => {
+  var allergy = req.body.foodAllergy;
+  var allergylist = req.session.allergies || [];
+
+  console.log(allergy);
+
+  const schema = Joi.string().max(20).required();
+  const validationResult = schema.validate(allergy);
+  if (validationResult.error != null) {
+    console.log(validationResult.error);
+    res.redirect("/profile");
+    return;
+  }
+
+  allergylist.push(allergy);
+  req.session.allergies = allergylist;
+
+  await userCollection.updateOne({ username: req.session.username }, { $set: { allergies: allergylist } });
   res.redirect('/profile');
 });
 
@@ -335,9 +548,13 @@ app.post('/changepw', async (req, res) => {
 
   //right now it just makes up a user and posts it with a favourites array. when login is implemented, it will pull the users favourites,
 //add onto it, then update it
-app.post('/favourite', async (req,res) => {
+app.post('/favourite', loginValidation, async (req,res) => {
     var history = req.session.history;
     var dish = history.find(element => element.name == req.query.dishName);
+
+    if(dish.numFavs == undefined) {
+      dish.numFavs = 0;
+    } 
 
     var favourites = req.session.favourites;
     var username = req.session.username;
@@ -346,21 +563,25 @@ app.post('/favourite', async (req,res) => {
 
     var removed = false;
 
-    if(favourites == "") {
-        favourites = [];
-    }
+    // if(favourites == "") {
+    //     favourites = [];
+    // }
+
     for(i = 0; i < favourites.length; i++) {
         if(dish.name == favourites[i].name) {
             favourites.splice(i, 1);
             removed = true;
+            dish.numFavs = dish.numFavs-1;
         }
     }
     if(!removed){
         favourites.push(dish);
+        dish.numFavs = dish.numFavs+1;
     }
     req.session.favourites = favourites;
     await userCollection.updateOne({username: username}, {$set: {favourites: favourites}});
-    res.redirect('back');
+    await dishCollection.updateOne({id: dish.id}, {$set: {numFavs: dish.numFavs}});
+    res.sendStatus(200);
 });
 
 app.get("*", (req, res) => {

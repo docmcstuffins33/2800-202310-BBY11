@@ -1,22 +1,45 @@
 <%- include("templates/header") %>
 
+  <link rel="stylesheet" href="/css/style.css">
+
   <div class="container">
-    <h2>Account Settings</h2>
-    <form action="/changepw" method="post">
-      <!-- <label for="newUsername">New Username:</label>
-  <input type="text" id="newUsername" name="newUsername" required><br> -->
 
-      <!-- <label for="newEmail">New Email:</label>
-  <input type="email" id="newEmail" name="newEmail" required><br> -->
+    <div class="form-signin w-100 m-auto">
+      <form action="/changepw" method="post" style="margin-top: 30px;">
+        <h1 class="h3 mb-3 fw-normal">Account Settings</h1>
+        <div class="form-floating">
+          <input type="password" class="form-control" id="currentPassword" name="currentPassword" required>
+          <label for="currentPassword">Current Password:</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" id="newPassword" name="newPassword" required>
+          <label for="newPassword">Password</label>
+        </div>
 
-      <label for="currentPassword">Current Password:</label>
-      <input type="password" id="currentPassword" name="currentPassword" required><br>
 
-      <label for="newPassword">New Password:</label>
-      <input type="password" id="newPassword" name="newPassword"><br>
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Save Changes</button>
+        <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2023</p>
+      </form>
+    </div>
 
-      <button type="submit">Save Changes</button>
-    </form>
+    <style>
+      .form-signin {
+        max-width: 330px;
+        padding: 0px;
+      }
+
+      .form-signin .form-floating:focus-within {
+        z-index: 2;
+      }
+
+      .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-radius: 0;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+    </style>
+
   </div>
 
   <%- include("templates/footer") %>

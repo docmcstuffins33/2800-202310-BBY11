@@ -1,13 +1,165 @@
 <%- include("templates/header") %>
 
+<style>
 
-<div class="container">
-    <div class="row">
-      <div class="text-center">
-        <button id="fetchDishButton" class="btn btn-secondary rounded-pill px-5 " data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Random Dish</button>
-      </div>
-    </div>
-</div>
+  body {
+    background-color: #FFF8D6;
+  }
+
+  .container {
+  margin-top: 30px;
+}
+
+.btn {
+  font-size: 16px;
+}
+
+.dropdown-toggle {
+  width: 70%;
+  text-align: center;
+  border-radius: 30px;
+}
+
+.dropdown-menu {
+  min-width: 70%;
+}
+
+.dropdown-item {
+  text-align: center;
+}
+
+h1 {
+  font-size: 25px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  color: #333;
+}
+
+#fetchDishButton {
+    background-color:#3C6255;
+    color: #ffffff;
+    border-color: #3C6255;
+    border-radius: 30px;
+    padding: 15px 35px;
+  }
+
+  #fetchDishButton:hover {
+    background-color: #40513B;
+    border-color: #40513B;
+  }
+
+  .btn-secondary {
+    background-color: #A6BB8D;
+    color: #ffffff;
+    border-color: #A6BB8D;
+    padding: 8px 18px;
+  }
+
+  .btn-secondary:hover {
+    background-color: #61876E;
+    border-color: #61876E;
+  }
+
+  .custom-spinner {
+  width: 3rem; /* Customize the width of the spinner */
+  height: 3rem; /* Customize the height of the spinner */
+  border-width: 0.25em; /* Customize the border width of the spinner */
+}
+
+@media (max-width: 576px) {
+  h1 {
+    font-size: 20px;
+  }
+
+  .dropdown-toggle {
+  width: 40%;
+  text-align: center;
+  border-radius: 30px;
+}
+
+.dropdown-menu {
+  min-width: 40%;
+}
+
+}
+
+@media (max-width: 767px) {
+  .btn {
+    font-size: 14px;
+  }
+
+  .dropdown-toggle {
+  width: 60%;
+  text-align: center;
+  border-radius: 30px;
+}
+
+.dropdown-menu {
+  min-width: 60%;
+}
+}
+  .modal-content {
+    height: 300px; /* set the height to 80% of the viewport height */
+    max-height: none; /* remove the max-height limit */
+    overflow-y: auto; /* add vertical scrollbar if needed */
+    background-color: #f4b183;
+    color: #333333;
+  }
+
+  .btn-primary {
+    background-color: #a6bb8d;
+    color: #ffffff;
+    border-color: #a6bb8d;
+    padding: 8px 18px;
+  }
+
+  .btn-primary:hover {
+    background-color: #61876e;
+    border-color: #61876e;
+  }
+  /* Base styles */
+  .modal-content {
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    color: #333;
+    font-size: large;
+  }
+
+  .modal-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .card-text {
+    margin-bottom: 0.5rem;
+  }
+
+  .modal-body p {
+    margin-bottom: 1rem;
+    line-height: 1.5;
+  }
+
+  .btn-light:hover {
+    background-color: #cbb279;
+    border-color: #cbb279;
+  }
+
+  .btn-light {
+    background-color: #e1d4bb;
+    border-color: #e1d4bb;
+  }
+  
+  .modal-dialog {
+  border: none; /* Remove the border */
+  border-radius: 0; /* Remove the border radius */
+}
+
+
+
+</style>
 
 <div id="dishModal" class="modal fade" tabindex="-1" role="dialog">
   <div class="modal-dialog" role="document">
@@ -28,109 +180,279 @@
   </div>
 </div>
 
-
 <div class="container">
-    <h1 style="font-family: 'Arial', sans-serif; color: #333; margin-top: 50px; margin-bottom: 30px;">Filters</h1>
-    <div class="dropdown-center" style="margin-top: 10px;">
-      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Select
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Action two</a></li>
-        <li><a class="dropdown-item" href="#">Action three</a></li>
-      </ul>
-    </div>
-  <br>
-    <div class="dropdown-center">
-      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Select
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Action two</a></li>
-        <li><a class="dropdown-item" href="#">Action three</a></li>
-      </ul>
-    </div>
-
-    <br>
-    <div class="dropdown-center">
-      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Select
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Action two</a></li>
-        <li><a class="dropdown-item" href="#">Action three</a></li>
-      </ul>
-    </div>
-
-    <br>
-    <div class="dropdown-center">
-      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Select
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Action two</a></li>
-        <li><a class="dropdown-item" href="#">Action three</a></li>
-      </ul>
-    </div>
-
-    <br>
-    <div class="dropdown-center">
-      <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-        Select
-      </button>
-      <ul class="dropdown-menu">
-        <li><a class="dropdown-item" href="#">Action</a></li>
-        <li><a class="dropdown-item" href="#">Action two</a></li>
-        <li><a class="dropdown-item" href="#">Action three</a></li>
-      </ul>
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+      <button id="fetchDishButton" class="btn btn-secondary rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Random Dish</button>
     </div>
   </div>
-<br>
-  <div class="container">
-    <div class="row">
-      <div class="text-center">
-        <button class="btn btn-secondary rounded-pill px-5" type="button">Search</button>
-      </div>
+
+  <h1 class="text-left" style="font-family: 'Arial', sans-serif; color: #333; margin-top: 50px; margin-bottom: 30px;">Filters</h1>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+      <h4>Complexity</h4>
+        <select id="complexitySelect" class="form-select" aria-label="Default select example">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="complex">Complex</option>
+        </select>
     </div>
+  </div>
+
+
+  <br>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <h4>Time to cook: <span id="minuteValue">0</span> minutes</h4>
+      <input type="range" class="form-control-range" min="5" max="200" id="sliderInput" step="15">
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+      <h4>Add Ingredients</h4>
+      <form id="ingredient-form">
+        <label for="ingredient-input">Ingredient:</label>
+        <input type="text" id="ingredient-input" autocomplete="off">
+        <input type="submit" value="Add">
+      </form>
+      
+      <ul id="ingredient-list"></ul>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+      <button id="searchButton" class="btn btn-secondary rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Search</button>
+    </div>
+  </div>
 </div>
 
-  
+<br>
 
 <script>
   // JavaScript
   const fetchDishButton = document.getElementById('fetchDishButton');
+  const searchButton = document.getElementById('searchButton');
   const modal = document.getElementById('dishModal');
-  fetchDishButton.addEventListener('click', fetchDish);
+  fetchDishButton.addEventListener('click', fetchRandomDish);
+  searchButton.addEventListener('click', fetchSearchedDish);
 
-  function fetchDish() {
-    fetch('/dish') // Assuming the server handles requests to '/dish' endpoint
-      .then(response => response.json())
-      .then(data => {
-        modal.innerHTML = `
-        <div class="modal-dialog" role="document">
-        <div class="modal-content rounded-4 shadow">
+  $(document).ready(function() {
+      // Get the slider input element
+      var sliderInput = document.getElementById("sliderInput");
+
+      // Get the value display element
+      var sliderValue = document.getElementById("minuteValue");
+
+      // Update the value display when the slider value changes
+      sliderInput.addEventListener("input", function() {
+        sliderValue.innerText = sliderInput.value;
+      });
+    });
+
+    
+let ingredients = [];
+
+// Get the form and the ingredient list
+const form = document.getElementById("ingredient-form");
+const ingredientList = document.getElementById("ingredient-list");
+
+// Handle form submission
+form.addEventListener("submit", function(event) {
+  event.preventDefault(); // Prevent form submission
+
+  // Get the input value
+  const input = document.getElementById("ingredient-input");
+  const ingredient = input.value.trim();
+
+  // Add ingredient to the list if it's not empty and not already added
+  if (ingredient !== "" && !ingredients.includes(ingredient)) {
+    ingredients.push(ingredient);
+
+    // Create a new list item
+    const listItem = document.createElement("li");
+    // Create a span element for the ingredient name
+    const ingredientName = document.createElement("span");
+    ingredientName.textContent = ingredient;
+    listItem.appendChild(ingredientName);
+
+    // Create a button to remove the ingredient
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "-";
+    removeButton.addEventListener("click", function() {
+      removeIngredient(ingredient);
+    });
+    listItem.appendChild(removeButton);
+
+    // Append the list item to the ingredient list
+    ingredientList.appendChild(listItem);
+
+    // Clear the input field
+    input.value = "";
+  }
+});
+
+// Function to remove an ingredient from the list
+function removeIngredient(ingredient) {
+  const index = ingredients.indexOf(ingredient);
+  if (index !== -1) {
+    ingredients.splice(index, 1);
+    refreshIngredientList();
+  }
+}
+
+// Function to refresh the ingredient list
+function refreshIngredientList() {
+  // Clear the list
+  ingredientList.innerHTML = "";
+
+  // Re-populate the list
+  ingredients.forEach(function(ingredient) {
+    const listItem = document.createElement("li");
+
+    const ingredientName = document.createElement("span");
+    ingredientName.textContent = ingredient;
+    listItem.appendChild(ingredientName);
+
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", function() {
+      removeIngredient(ingredient);
+    });
+    listItem.appendChild(removeButton);
+
+    ingredientList.appendChild(listItem);
+  });
+}
+
+function fetchRandomDish() {
+  const modalContent = document.querySelector('.modal-content');
+  modalContent.classList.add('loading'); // Add loading class
+
+  // Show loading message
+  modalContent.innerHTML = `
         <div class="modal-header border-bottom-0">
-          <h1 class="modal-title fs-5">${data.name}</h1>
+          <h1 class="modal-title fs-5">Generating dish...</h1>
+        </div>
+        <div class="modal-body text-center py-3">
+          <div class="custom-spinner spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+  `;
+
+  fetch('/dish')
+    .then(response => response.json())
+    .then(data => {
+      // Generate the modal content with the fetched data
+      modalContent.innerHTML = `
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">${data.name}</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+              <p>${data.description}</p>
+            </div>
+            <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+              <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+            </div>
+      `;
+
+      modalContent.classList.remove('loading'); // Remove loading class
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      modalContent.classList.remove('loading'); // Remove loading class on error
+    });
+}
+
+
+
+function fetchSearchedDish() {
+  const modalContent = document.querySelector('.modal-content');
+  modalContent.classList.add('loading'); // Add loading class
+  var sliderValue = document.getElementById("minuteValue");
+  var complexitySelect = document.getElementById("complexitySelect");
+  const data = {
+    minutes: parseInt(sliderValue.innerText),
+    complexity: complexitySelect.value,
+    ingredients: ingredients
+  };
+  
+  // Show loading icon
+  modalContent.innerHTML = `
+        <div class="modal-header border-bottom-0">
+          <h1 class="modal-title fs-5">Generating your dish...</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body py-0">
-          <p>${data.description}</p>
+        <div class="modal-body text-center py-3">
+          <div class="custom-spinner spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
         </div>
-        <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
-          <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
-        </div>
-      </div>
-      </div>
-        `;
+  `;
+
+  fetch('/searchDish', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
   })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  }
+    .then(response => {
+      if (response.status === 204) {
+        return;
+      } else if (response.ok) {
+        return response.json();
+      }
+    })
+    .then(data => {
+      if (!data) {
+        modalContent.innerHTML = `
+              <div class="modal-header border-bottom-0">
+                <h1 class="modal-title fs-5">No Results Found</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+        `;
+        return;
+      }
+      modalContent.innerHTML = `
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">${data.name}</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+              <p>${data.description}</p>
+            </div>
+            <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+              <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+            </div>
+      `;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      modalContent.innerHTML = `
+        <div class="modal-dialog" role="document">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">Error</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+      `;
+    })
+    .finally(() => {
+      modalContent.classList.remove('loading'); // Remove loading class
+    });
+}
+
+
 </script>
 
 

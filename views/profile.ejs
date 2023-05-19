@@ -1,5 +1,14 @@
 <%- include("templates/header") %>
 
+<link rel="stylesheet" href="/css/style.css">
+
+<style>
+  .btn {
+    width: auto;
+    margin: 10px
+  }
+</style>
+
 <div class="container">
   <h1>Hello, <%= username %></h1>
 
@@ -9,44 +18,110 @@
       <thead>
         <tr>
           <th scope="col">Username</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= username %></td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr>
           <th scope="col">Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= email %></td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr>
           <th scope="col">Dietary Restriction(s)</th>
         </tr>
       </thead>
       <tbody>
-          <tr>
-            <td>
-              <%= username %>
-            </td>
-            <td>
-              <%= email %>
-            </td>
-            <td>
-              <%= dietaryRestriction %>
-            </td>
-          </tr>
+        <tr>
+          <td>
+            <% dietaryRestriction.forEach(function(item) { %>
+            <p><%= item %></p>
+            <% }); %>
+            <form method="POST" action="/saveDietaryRestriction">
+              <!-- Dropdown menu code -->
+              <select name="dietaryRestriction">
+                <!-- Options for the dropdown -->
+                <option value="">Select a dietary restriction</option>
+                <option value="Vegetarian">Vegetarian</option>
+                <option value="Vegan">Vegan</option>
+                <option value="Pescatarian">Pescatarian</option>
+                <option value="Gluten-free">Gluten-free</option>
+                <option value="Dairy-free">Dairy-free</option>
+                <!-- Add more options as needed -->
+              </select>
+              <button class="w-20 btn btn-lg btn-primary" type="submit">Add</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr>
+          <th scope="col">Food Allergy(s)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <form action="/allergySave" method="post">
+              <input type="text" class="form-control" name="foodAllergy" id="foodAllergy">
+              <button class="w-20 btn btn-lg btn-primary">Save</button>
+            </form>
+          </td>
+        </tr>
       </tbody>
     </table>
-    </body>
   </div>
 
-  <form action="/dietarySave" method="post">
-    <input type="text" class="form-control" name="dietaryRestriction">
-    <button>Save</button>
-  </form>
-
   <form action="/favourites" method="get">
-    <button>Favourites</button>
+    <button class="w-200 btn btn-lg btn-primary">Favourites</button>
   </form>
 
   <form action="/reset" method="get">
-    <button>Reset Password</button>
+    <button class="w-20 btn btn-lg btn-primary">Reset Password</button>
   </form>
 
   <form action="/logout" method="get">
-    <button>Logout</button>
+    <button class="w-20 btn btn-lg btn-primary">Logout</button>
   </form>
-
 </div>
+
+<br>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>   
+
+<script>
+  $(function() {
+    $("#foodAllergy").autocomplete({
+      source: function(request, response) {
+        $.ajax({
+          url: "/ingredients", // Endpoint URL
+          method: "GET",
+          data: {
+            query: request.term
+          },
+          success: function(data) {
+            response(data);
+          }
+        });
+      },
+      minLength: 1, // Minimum input length to trigger autocomplete
+      select: function(event, ui) {
+        $("#foodAllergy").val(ui.item.value); // Set the selected value in the input field
+        return false;
+      }
+    });
+  });
+</script>
 
 <%- include("templates/footer") %>

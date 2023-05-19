@@ -1,34 +1,23 @@
 <%- include("templates/header") %>
 
-<style>
+<link rel="stylesheet" href="/css/style.css">
 
-  hr.divider {
-  height: 0.2rem;
-  max-width: 3.25rem;
-  margin: 1.5rem auto;
-  background-color: #f4623a;
-  opacity: 1;
-}
 
-hr.divider-light {
-  background-color: #fff;
-}
-</style>
-
-<section class="page-section" id="about">
-  <div class="container px-4 px-lg-5">
+  <section class="page-section" id="about">
+    <div class="container px-4 px-lg-5">
       <div class="row gx-4 gx-lg-5 justify-content-center">
-          <div class="col-lg-8 text-center">
-              <img src="/images/logo.jpg" width="250" height="250" alt="SpiceOfLife logo">
-              <h2 class="text-black mt-0">Hungry? Why Wait? Grab a Spice.</h2>
-              <hr class="divider divider-light" />
-              <p class="text-white-75 mb-4">SpiceOfLife has all the tools you need to get into finding and learning new recipes, spicing up your life like never before!</p>
-              <a class="btn btn-success btn-xl" href="/search">Get Started with a simple search</a>
-              <h4>OR</h4>
-              <a class="btn btn-info btn-xl" href="/profile">Sign up/Log in to start saving recipes!</a>
-          </div>
+        <div class="col-lg-8 text-center">
+          <img src="/images/logo.jpg" width="250" height="250" alt="SpiceOfLife logo">
+          <h2 class="text-black mt-0">Hungry? Why Wait? Grab a Spice.</h2>
+          <hr class="divider divider-light" />
+          <p class="text-white-75 mb-4">SpiceOfLife has all the tools you need to get into finding and learning new
+            recipes, spicing up your life like never before!</p>
+          <a class="btn btn-success btn-xl" href="/search">Get Started with a simple search</a>
+          <h4>OR</h4>
+          <a class="btn btn-info btn-xl" href="/profile">Sign up/Log in to start saving recipes!</a>
+        </div>
       </div>
-  </div>
-</section>
+    </div>
+  </section>
 
-<%- include("templates/footer") %>
+  <%- include("templates/footer") %>

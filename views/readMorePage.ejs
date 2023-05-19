@@ -1,30 +1,219 @@
 <%- include("templates/header") %>
+<style>
+  body {
+    background-color: #fff8d6;
+  }
+
+  h1 {
+    font-size: 35px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+    color: #333;
+  }
+
+  .btn-light:hover {
+    background-color: #cbb279;
+    border-color: #cbb279;
+  }
+
+  .btn-light {
+    background-color: #e1d4bb;
+    border-color: #e1d4bb;
+  }
+
+  .card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background-color: #f4b183;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    color: #333333;
+    font-family: "Gill Sans", "Gill Sans MT", Calibri, "Trebuchet MS",
+      sans-serif;
+    color: #333;
+    font-size: large;
+    height: 480px;
+   overflow-y: auto;
+  }
+
+  .close-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    color: #999;
+  }
+
+  .btn-favorite {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 6px;
+    background-color: transparent;
+    border: none;
+  }
+
+  .card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }
+
+  .card-text {
+    margin-bottom: 10px;
+    line-height: 1.5;
+    font-size: large;
+  }
+
+  @media (max-width: 576px) {
+    .card-body {
+      padding: 15px;
+    }
+
+    .close-icon,
+    .btn-favorite {
+      top: 5px;
+      right: 5px;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+    }
+  }
+</style>
 
 <div class="container">
-    <div class="row">
-      <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-              <a href="/" onclick="history.go(-1); return false;"><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button></a>
-              <form action='/favourite?dishName=<%= dish.name %>&page=readMore?dish=<%= dish.name %>' method='post'>
-                <button class="btn btn-secondary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
-                  <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.522-3.356c.33-.314.16-.888-.282-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.12l-4.898.696c-.441.062-.612.636-.283.95l3.523 3.356-.83 4.73zm4.905-2.767-3.686 1.894.694-3.957a.565.565 0 0 0-.163-.505L1.71 6.745l4.052-.576a.525.525 0 0 0 .393-.288L8 2.223l1.847 3.658a.525.525 0 0 0 .393.288l4.052.575-2.906 2.77a.565.565 0 0 0-.163.506l.694 3.957-3.686-1.894a.503.503 0 0 0-.461 0z"/>
-                </svg>
-              </button>
-            </form>
-            <h5 class="card-title"><%= dish.name %></h5>
-            <p class="card-text">Description: <%= dish.description %></p>
-            <p class="card-text">Ingredients: <%= dish.ingredients %></p>
-            <p class="card-test">Steps: <%= dish.steps %></p>
-          </div>
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <a href="/" onclick="history.go(-1); return false;"
+            ><button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button
+          ></a>
+          <% if (loggedIn) { %>
+          <button
+            class="btn btn-light"
+            id="favourite"
+            style="position: absolute; top: 20px; right: 20px;"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+            >
+              <path
+                d="M6.28 3c3.236.001 4.973 3.491 5.72
+                  5.031.75-1.547 2.469-5.021 5.726-5.021 2.058 0 4.274 1.309
+                  4.274 4.182 0 3.442-4.744 7.851-10
+                  13-5.258-5.151-10-9.559-10-13 0-2.676 1.965-4.193
+                  4.28-4.192zm.001-2c-3.183 0-6.281 2.187-6.281 6.192 0 4.661
+                  5.57 9.427 12 15.808 6.43-6.381 12-11.147 12-15.808
+                  0-4.011-3.097-6.182-6.274-6.182-2.204 0-4.446 1.042-5.726
+                  3.238-1.285-2.206-3.522-3.248-5.719-3.248z"
+              />
+            </svg>
+          </button>
+          <% } %>
+          <h5 class="card-title" id="dishTitle"><%= dish.name %></h5>
+          <% if(dish.numFavs == undefined) { %>
+          <p class="card-text">Number of favourites: 0</p>
+          <% } else { %>
+          <p class="card-text">Number of favourites: <%= dish.numFavs %></p>
+          <% } %>
+          <p class="card-text">Description: <%= dish.description %></p>
+          <p class="card-text">Time to cook: <%= dish.minutes %> minutes</p>
+          <p class="card-text">
+            <ul> Ingredients: 
+              <% let i=0; %>
+              <% for(i=0; i < dish.ingredients.length; i++) { %>
+                  <li><%= dish.ingredients[i] %></li>
+              <% } %> 
+          </ul>
+        </p>
+          <p class="card-text">
+            <ol>
+              Steps:               
+              <% for(i=0; i < dish.steps.length; i++) { %>
+                  <li><%= dish.steps[i] %></li>
+              <% } %> 
+            </ol>
+          </p>
+          <section class="image-section"></section>
         </div>
       </div>
     </div>
   </div>
+</div>
 
-  <script>
-    document.getElementById("demo").innerHTML = "Hello JavaScript!";
-  </script>
+<script>
+  // JavaScript
+  const favouriteButton = document.getElementById("favourite");
+  const dishTitle = document.getElementById("dishTitle");
+  favouriteButton.addEventListener("click", callFavourite);
+
+  const api_key = API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2FmNDkyMmUtOTVlNS00MzA2LTllYWQtM2Y3OGE3OTk4MjVkIiwidHlwZSI6ImFwaV90b2tlbiJ9.2i4A4Yvt63SD9GWS6-RHxj5bybWMPkKErvUyKyzyZZU";
+  const submitIcon = document.querySelector('#submit-icon');
+  const inputElement = document.getElementById("dishTitle"); 
+  const imageSection = document.querySelector('.image-section');
+
+  function callFavourite() {
+    $.ajax({
+      url: `/favourite?dishName=${dishTitle.innerHTML}`, // Assuming the server handles requests to '/function' endpoint
+      method: "POST", // Use 'POST' if the function requires additional data
+      success: function (response) {
+        // Handle the server response if needed
+        console.log(response);
+      },
+      error: function (error) {
+        console.error("Error:", error);
+      },
+    });
+  }
+
+  const getImages = async () => {
+    const options = {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${api_key}`,
+        accept: 'application/json',
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        providers: 'openai',
+        response_as_dict: true,
+        attributes_as_list: false,
+        show_original_response: false,
+        resolution: '256x256',
+        num_images: 1,
+        text: inputElement.innerHTML,
+      })
+    }
+    try {
+      const response = await fetch('https://api.edenai.run/v2/image/generation', options)
+      const data = await response.json();
+      console.log(data.openai.items[0].image_resource_url);
+      
+      // putting the image into the page
+
+        const imageContainer = document.createElement('div');
+        imageContainer.classList.add('image-container');
+        const imageElement = document.createElement('img');
+        imageElement.setAttribute('src', data.openai.items[0].image_resource_url);
+        imageContainer.append(imageElement);
+        imageSection.append(imageContainer);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+  $(document).ready(getImages);
+
+</script>
 
 <%- include("templates/footer") %>
