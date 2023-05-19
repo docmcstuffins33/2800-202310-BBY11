@@ -2,6 +2,12 @@
 
 <link rel="stylesheet" href="/css/style.css">
 
+<style>
+  .btn {
+    width: auto;
+    margin: 10px
+  }
+</style>
 
 <div class="container">
   <h1>Hello, <%= username %></h1>
@@ -52,7 +58,7 @@
                 <option value="Dairy-free">Dairy-free</option>
                 <!-- Add more options as needed -->
               </select>
-              <button type="submit">Add</button>
+              <button class="w-20 btn btn-lg btn-primary" type="submit">Add</button>
             </form>
           </td>
         </tr>
@@ -67,7 +73,7 @@
           <td>
             <form action="/allergySave" method="post">
               <input type="text" class="form-control" name="foodAllergy" id="foodAllergy">
-              <button>Save</button>
+              <button class="w-20 btn btn-lg btn-primary">Save</button>
             </form>
           </td>
         </tr>
@@ -76,15 +82,15 @@
   </div>
 
   <form action="/favourites" method="get">
-    <button>Favourites</button>
+    <button class="w-200 btn btn-lg btn-primary">Favourites</button>
   </form>
 
   <form action="/reset" method="get">
-    <button>Reset Password</button>
+    <button class="w-20 btn btn-lg btn-primary">Reset Password</button>
   </form>
 
   <form action="/logout" method="get">
-    <button>Logout</button>
+    <button class="w-20 btn btn-lg btn-primary">Logout</button>
   </form>
 </div>
 

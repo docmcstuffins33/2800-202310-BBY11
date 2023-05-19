@@ -1,4 +1,5 @@
 <%- include("templates/header") %>
+<link rel="stylesheet" href="/css/style.css">
   <style>
     body {
       background-color: #FFF8D6;
@@ -42,7 +43,53 @@
     crossorigin="anonymous"></script> -->
 
   <div class="container">
-    <h1>Log in</h1>
+
+
+    <div class="form-signin w-100 m-auto">
+      <form action="/loginSubmit" method="post" style="margin-top: 30px;">
+        <h1 class="h3 mb-3 fw-normal">Log In</h1>
+        <div class="form-floating">
+          <input type="email" class="form-control" name="email" required>
+          <label for="email">Email address</label>
+        </div>
+        <div class="form-floating">
+          <input type="password" class="form-control" name="password" required>
+          <label for="password">Password</label>
+        </div>
+
+
+        <button class="w-100 btn btn-lg btn-primary" type="submit">Submit</button>
+        <p class="mt-5 mb-3 text-body-secondary">&copy; 2017–2023</p>
+      </form>
+    </div>
+
+    <style>
+      .form-signin {
+        max-width: 330px;
+        padding: 15px;
+      }
+
+      .form-signin .form-floating:focus-within {
+        z-index: 2;
+      }
+
+      .form-signin input[type="email"] {
+        margin-bottom: -1px;
+        border-bottom-right-radius: 0;
+        border-bottom-left-radius: 0;
+      }
+
+      .form-signin input[type="password"] {
+        margin-bottom: 10px;
+        border-top-left-radius: 0;
+        border-top-right-radius: 0;
+      }
+    </style>
+
+
+
+
+    <!-- <h1>Log in</h1>
 
     <div class="form-group">
       <form action='/loginSubmit' method='post'>
@@ -53,6 +100,6 @@
     </div>
   </div>
 
-  <br>
+  <br> -->
 
   <%- include("templates/footer") %>
