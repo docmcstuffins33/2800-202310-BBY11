@@ -82,7 +82,7 @@ app.use('*', sessionValidation);
 
 app.get('/', (req, res) => {
   //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
-  res.render('index');
+  res.render('search');
 });
 
 app.get('/dish/:id', function (req, res) {

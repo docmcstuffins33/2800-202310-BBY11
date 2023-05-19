@@ -4,7 +4,6 @@
 
 
 <div class="container">
-
   <h1>Hello, <%= username %></h1>
 
   <div class="container-fluid">
@@ -13,48 +12,83 @@
       <thead>
         <tr>
           <th scope="col">Username</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= username %></td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr>
           <th scope="col">Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= email %></td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr>
           <th scope="col">Dietary Restriction(s)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <% dietaryRestriction.forEach(function(item) { %>
+            <p><%= item %></p>
+            <% }); %>
+            <form method="POST" action="/saveDietaryRestriction">
+              <!-- Dropdown menu code -->
+              <select name="dietaryRestriction">
+                <!-- Options for the dropdown -->
+                <option value="">Select a dietary restriction</option>
+                <option value="Vegetarian">Vegetarian</option>
+                <option value="Vegan">Vegan</option>
+                <option value="Pescatarian">Pescatarian</option>
+                <option value="Gluten-free">Gluten-free</option>
+                <option value="Dairy-free">Dairy-free</option>
+                <!-- Add more options as needed -->
+              </select>
+              <button type="submit">Add</button>
+            </form>
+          </td>
+        </tr>
+      </tbody>
+      <thead>
+        <tr>
           <th scope="col">Food Allergy(s)</th>
         </tr>
       </thead>
       <tbody>
-          <tr>
-            <td>
-              <%= username %>
-            </td>
-            <td>
-              <%= email %>
-            </td>
-            <td>
-              <% dietaryRestriction.forEach(function(item) { %>
-                <p><%= item %></p>
-              <% }); %>
-              <form method="POST" action="/saveDietaryRestriction">
-                <!-- Dropdown menu code -->
-                <select name="dietaryRestriction">
-                  <!-- Options for the dropdown -->
-                  <option value="">Select a dietary restriction</option>
-                  <option value="Vegetarian">Vegetarian</option>
-                  <option value="Vegan">Vegan</option>
-                  <option value="Pescatarian">Pescatarian</option>
-                  <option value="Gluten-free">Gluten-free</option>
-                  <option value="Dairy-free">Dairy-free</option>
-                  <!-- Add more options as needed -->
-                </select>
-                <button type="submit">Add</button>
-              </form>
-            </td>
-            <td>
-              <form action="/allergySave" method="post">
-                <input type="text" class="form-control" name="foodAllergy" id="foodAllergy">
-                <button>Save</button>
-              </form>
-            </td>
-          </tr>
+        <tr>
+          <td>
+            <form action="/allergySave" method="post">
+              <input type="text" class="form-control" name="foodAllergy" id="foodAllergy">
+              <button>Save</button>
+          </td>
+        </tr>
       </tbody>
     </table>
   </div>
+
+  <form action="/favourites" method="get">
+    <button>Favourites</button>
+  </form>
+
+  <form action="/reset" method="get">
+    <button>Reset Password</button>
+  </form>
+
+  <form action="/logout" method="get">
+    <button>Logout</button>
+  </form>
+</div>
+
+<br>
+
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>   
@@ -82,20 +116,5 @@
     });
   });
 </script>
-
-
-  <form action="/favourites" method="get">
-    <button>Favourites</button>
-  </form>
-
-  <form action="/reset" method="get">
-    <button>Reset Password</button>
-  </form>
-
-  <form action="/logout" method="get">
-    <button>Logout</button>
-  </form>
-
-</div>
 
 <%- include("templates/footer") %>
