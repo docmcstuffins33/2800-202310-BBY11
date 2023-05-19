@@ -62,6 +62,12 @@ h1 {
     border-color: #61876E;
   }
 
+  .custom-spinner {
+  width: 3rem; /* Customize the width of the spinner */
+  height: 3rem; /* Customize the height of the spinner */
+  border-width: 0.25em; /* Customize the border width of the spinner */
+}
+
 @media (max-width: 576px) {
   h1 {
     font-size: 20px;
@@ -146,6 +152,11 @@ h1 {
     border-color: #e1d4bb;
   }
   
+  .modal-dialog {
+  border: none; /* Remove the border */
+  border-radius: 0; /* Remove the border radius */
+}
+
 
 
 </style>
@@ -319,88 +330,149 @@ function refreshIngredientList() {
   });
 }
 
-  function fetchRandomDish() {
-    fetch('/dish') // Assuming the server handles requests to '/dish' endpoint
-      .then(response => response.json())
-      .then(data => {
-        modal.innerHTML = `
-        <div class="modal-dialog" role="document">
-        <div class="modal-content rounded-4 shadow">
+function fetchRandomDish() {
+  const modalContent = document.querySelector('.modal-content');
+  modalContent.classList.add('loading'); // Add loading class
+
+  // Show loading message
+  modalContent.innerHTML = `
+    <div class="modal-dialog" role="document">
+      <div class="modal-content rounded-4 shadow">
         <div class="modal-header border-bottom-0">
-          <h1 class="modal-title fs-5">${data.name}</h1>
+          <h1 class="modal-title fs-5">Generating dish...</h1>
+        </div>
+        <div class="modal-body text-center py-3">
+          <div class="custom-spinner spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  fetch('/dish')
+    .then(response => response.json())
+    .then(data => {
+      // Generate the modal content with the fetched data
+      modalContent.innerHTML = `
+        <div class="modal-dialog" role="document">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">${data.name}</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+              <p>${data.description}</p>
+            </div>
+            <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+              <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+            </div>
+          </div>
+        </div>
+      `;
+
+      modalContent.classList.remove('loading'); // Remove loading class
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      modalContent.classList.remove('loading'); // Remove loading class on error
+    });
+}
+
+
+
+function fetchSearchedDish() {
+  const modalContent = document.querySelector('.modal-content');
+  modalContent.classList.add('loading'); // Add loading class
+  var sliderValue = document.getElementById("minuteValue");
+  var complexitySelect = document.getElementById("complexitySelect");
+  const data = {
+    minutes: parseInt(sliderValue.innerText),
+    complexity: complexitySelect.value,
+    ingredients: ingredients
+  };
+  
+  // Show loading icon
+  modalContent.innerHTML = `
+    <div class="modal-dialog" role="document">
+      <div class="modal-content rounded-4 shadow">
+        <div class="modal-header border-bottom-0">
+          <h1 class="modal-title fs-5">Generating your dish...</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body py-0">
-          <p>${data.description}</p>
-        </div>
-        <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
-          <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+        <div class="modal-body text-center py-3">
+          <div class="custom-spinner spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div>
         </div>
       </div>
-      </div>
-        `;
-  })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  }
+    </div>
+  `;
 
-  function fetchSearchedDish() {
-    var sliderValue = document.getElementById("minuteValue");
-    var complexitySelect = document.getElementById("complexitySelect");
-    const data = {
-      minutes: parseInt(sliderValue.innerText),
-      complexity: complexitySelect.value,
-      ingredients: ingredients
-    }
-    fetch('/searchDish', {
+  fetch('/searchDish', {
     method: 'POST',
     headers: {
-    'Content-Type': 'application/json'
+      'Content-Type': 'application/json'
     },
-    body: JSON.stringify(data)}) // Assuming the server handles requests to '/dish' endpoint
-      .then(response => { 
-        if(response.status === 204) {
+    body: JSON.stringify(data)
+  })
+    .then(response => {
+      if (response.status === 204) {
+        return;
+      } else if (response.ok) {
+        return response.json();
+      }
+    })
+    .then(data => {
+      if (!data) {
+        modalContent.innerHTML = `
+          <div class="modal-dialog" role="document">
+            <div class="modal-content rounded-4 shadow">
+              <div class="modal-header border-bottom-0">
+                <h1 class="modal-title fs-5">No Results Found</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+            </div>
+          </div>
+        `;
         return;
       }
-      else if(response.ok) {
-        return response.json()
-      }})
-      .then(data => {
-        if(!data) {
-          modal.innerHTML = `
-          <div class="modal-dialog" role="document">
-        <div class="modal-content rounded-4 shadow">
-        <div class="modal-header border-bottom-0">
-          <h1 class="modal-title fs-5">No Results Found</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-      </div>
-      </div>
-        `;
-          return;
-        }
-        modal.innerHTML = `
+      modalContent.innerHTML = `
         <div class="modal-dialog" role="document">
-        <div class="modal-content rounded-4 shadow">
-        <div class="modal-header border-bottom-0">
-          <h1 class="modal-title fs-5">${data.name}</h1>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">${data.name}</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body py-0">
+              <p>${data.description}</p>
+            </div>
+            <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+              <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+            </div>
+          </div>
         </div>
-        <div class="modal-body py-0">
-          <p>${data.description}</p>
+      `;
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      modalContent.innerHTML = `
+        <div class="modal-dialog" role="document">
+          <div class="modal-content rounded-4 shadow">
+            <div class="modal-header border-bottom-0">
+              <h1 class="modal-title fs-5">Error</h1>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+          </div>
         </div>
-        <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
-          <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
-        </div>
-      </div>
-      </div>
-        `;
-  })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  }
+      `;
+    })
+    .finally(() => {
+      modalContent.classList.remove('loading'); // Remove loading class
+    });
+}
+
+
 </script>
 
 
