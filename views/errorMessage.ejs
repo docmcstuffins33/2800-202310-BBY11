@@ -9,12 +9,15 @@
 
 
 <script>
-     const cat = document.getElementById('cat');
+    var catClicks = 0;
+    const cat = document.getElementById('cat');
     cat.addEventListener('click', meow);
 
     function meow() {
         var meow = new Audio('/sounds/meow.mp3')
         meow.play();
+        catClicks++
+        console.log(catClicks);
     }
 </script>
 
