@@ -12,6 +12,7 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 const Joi = require("joi");
+const { time } = require("console");
 
 const expireTime = 60 * 60 * 1000; //expires after 1 hour  (minutes * seconds * millis)
 
@@ -43,7 +44,7 @@ const dishCollection = database.db(mongodb_database).collection("dishes");
 
 
 app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.set('view engine', 'ejs');
 
@@ -119,23 +120,23 @@ app.get('/dish', async (req, res) => {
     });
 });
 
-app.get('/searchDish', async (req,res) => {
+app.post('/searchDish', async (req,res) => {
 
-  var timeToCook = 5;
+  var timeToCook = req.body.minutes;
 
-  var stepAmount = 5;
+  var complexity = req.body.complexity
 
-  var ingredientAmount = 10;
+  var ingredients = req.body.ingredients
 
-  var ingredients = ["honey"];
+  console.log(req.body)
 
   var conditions = ingredients.map(value => ({
     'ingredients': { $in: [new RegExp(value, "i")]}
   }));
 
   conditions.push({ $expr: { $lte: [ { $toInt: '$minutes' }, timeToCook ] } });
-  conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, stepAmount ] } });
-  conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, ingredientAmount] } });
+  // conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, stepAmount ] } });
+  // conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, ingredientAmount] } });
 
   const query = { $and: conditions};
 
