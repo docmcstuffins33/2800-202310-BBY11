@@ -321,7 +321,7 @@ function refreshIngredientList() {
 
   function fetchRandomDish() {
     fetch('/dish') // Assuming the server handles requests to '/dish' endpoint
-      .then(response => response.json)
+      .then(response => response.json())
       .then(data => {
         modal.innerHTML = `
         <div class="modal-dialog" role="document">
