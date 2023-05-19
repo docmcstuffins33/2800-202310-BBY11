@@ -336,8 +336,6 @@ function fetchRandomDish() {
 
   // Show loading message
   modalContent.innerHTML = `
-    <div class="modal-dialog" role="document">
-      <div class="modal-content rounded-4 shadow">
         <div class="modal-header border-bottom-0">
           <h1 class="modal-title fs-5">Generating dish...</h1>
         </div>
@@ -346,8 +344,6 @@ function fetchRandomDish() {
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
-      </div>
-    </div>
   `;
 
   fetch('/dish')
@@ -355,8 +351,6 @@ function fetchRandomDish() {
     .then(data => {
       // Generate the modal content with the fetched data
       modalContent.innerHTML = `
-        <div class="modal-dialog" role="document">
-          <div class="modal-content rounded-4 shadow">
             <div class="modal-header border-bottom-0">
               <h1 class="modal-title fs-5">${data.name}</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -367,8 +361,6 @@ function fetchRandomDish() {
             <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
               <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
             </div>
-          </div>
-        </div>
       `;
 
       modalContent.classList.remove('loading'); // Remove loading class
@@ -394,8 +386,6 @@ function fetchSearchedDish() {
   
   // Show loading icon
   modalContent.innerHTML = `
-    <div class="modal-dialog" role="document">
-      <div class="modal-content rounded-4 shadow">
         <div class="modal-header border-bottom-0">
           <h1 class="modal-title fs-5">Generating your dish...</h1>
           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -405,8 +395,6 @@ function fetchSearchedDish() {
             <span class="visually-hidden">Loading...</span>
           </div>
         </div>
-      </div>
-    </div>
   `;
 
   fetch('/searchDish', {
@@ -426,20 +414,14 @@ function fetchSearchedDish() {
     .then(data => {
       if (!data) {
         modalContent.innerHTML = `
-          <div class="modal-dialog" role="document">
-            <div class="modal-content rounded-4 shadow">
               <div class="modal-header border-bottom-0">
                 <h1 class="modal-title fs-5">No Results Found</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
-            </div>
-          </div>
         `;
         return;
       }
       modalContent.innerHTML = `
-        <div class="modal-dialog" role="document">
-          <div class="modal-content rounded-4 shadow">
             <div class="modal-header border-bottom-0">
               <h1 class="modal-title fs-5">${data.name}</h1>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -450,8 +432,6 @@ function fetchSearchedDish() {
             <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
               <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
             </div>
-          </div>
-        </div>
       `;
     })
     .catch(error => {
