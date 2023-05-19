@@ -34,7 +34,18 @@
     if (catClicks == 10) {
             var holy = new Audio('/sounds/holy.wav')
             holy.play();
-            
+            $.ajax({
+      url: `/meow`, 
+      method: "GET",
+      success: function (response) {
+        // Handle the server response if needed
+        console.log(response);
+        location.reload();
+      },
+      error: function (error) {
+        console.error("Error:", error);
+      },
+    });
     }
   }
 </script>
