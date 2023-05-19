@@ -12,6 +12,7 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 const Joi = require("joi");
+const { time } = require("console");
 
 const expireTime = 60 * 60 * 1000; //expires after 1 hour  (minutes * seconds * millis)
 
@@ -43,7 +44,7 @@ const dishCollection = database.db(mongodb_database).collection("dishes");
 
 
 app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.set('view engine', 'ejs');
 
@@ -118,6 +119,53 @@ app.get('/dish', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     });
 });
+
+app.post('/searchDish', async (req,res) => {
+
+  var timeToCook = req.body.minutes;
+
+  var complexity = req.body.complexity
+
+  var ingredients = req.body.ingredients
+
+  console.log(req.body)
+
+  var conditions = ingredients.map(value => ({
+    'ingredients': { $in: [new RegExp(value, "i")]}
+  }));
+
+  conditions.push({ $expr: { $lte: [ { $toInt: '$minutes' }, timeToCook ] } });
+
+  if(complexity == "easy") {
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 6 ] } });
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 6] } });
+  }
+  if(complexity == "medium") {
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 11 ] } });
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 8] } });
+  }
+  if(complexity == "complex") {
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_steps' }, 10 ] } });
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_ingredients' }, 9] } });
+  }
+
+  const query = { $and: conditions};
+
+  var dishes = await dishCollection.find(query).toArray();
+  if (dishes.length == 0) {
+    res.status(204).json({'error': 1})
+  } else {
+      var dishNum = Math.floor(Math.random() * dishes.length);
+      console.log(dishes.length);
+      var dish = dishes[dishNum];
+      console.log(dish);
+      req.session.history.push(dish);
+      if(req.session.loggedIn) {
+        userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      }
+      res.json(dish); // Send the dish as a JSON response
+    }
+})
 
 
 app.get('/dishcard', (req, res) => {

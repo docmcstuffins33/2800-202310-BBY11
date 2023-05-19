@@ -145,6 +145,7 @@ h1 {
     background-color: #e1d4bb;
     border-color: #e1d4bb;
   }
+  
 
 
 </style>
@@ -179,16 +180,35 @@ h1 {
 
   <div class="row justify-content-center">
     <div class="col-md-6 text-center">
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Select
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">Action</a></li>
-          <li><a class="dropdown-item" href="#">Action two</a></li>
-          <li><a class="dropdown-item" href="#">Action three</a></li>
-        </ul>
-      </div>
+      <h4>Complexity</h4>
+        <select id="complexitySelect" class="form-select" aria-label="Default select example">
+          <option value="easy">Easy</option>
+          <option value="medium">Medium</option>
+          <option value="complex">Complex</option>
+        </select>
+    </div>
+  </div>
+
+
+  <br>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+        <h4>Time to cook: <span id="minuteValue">0</span> minutes</h4>
+      <input type="range" class="form-control-range" min="5" max="200" id="sliderInput" step="15">
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-md-6 text-center">
+      <h4>Add Ingredients</h4>
+      <form id="ingredient-form">
+        <label for="ingredient-input">Ingredient:</label>
+        <input type="text" id="ingredient-input" autocomplete="off">
+        <input type="submit" value="Add">
+      </form>
+      
+      <ul id="ingredient-list"></ul>
     </div>
   </div>
 
@@ -196,58 +216,7 @@ h1 {
 
   <div class="row justify-content-center">
     <div class="col-md-6 text-center">
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Select
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">Action</a></li>
-          <li><a class="dropdown-item" href="#">Action two</a></li>
-          <li><a class="dropdown-item" href="#">Action three</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <br>
-
-  <div class="row justify-content-center">
-    <div class="col-md-6 text-center">
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Select
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">Action</a></li>
-          <li><a class="dropdown-item" href="#">Action two</a></li>
-          <li><a class="dropdown-item" href="#">Action three</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <br>
-
-  <div class="row justify-content-center">
-    <div class="col-md-6 text-center">
-      <div class="dropdown">
-        <button class="btn btn-secondary dropdown-toggle px-5" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-          Select
-        </button>
-        <ul class="dropdown-menu">
-          <li><a class="dropdown-item" href="#">Action</a></li>
-          <li><a class="dropdown-item" href="#">Action two</a></li>
-          <li><a class="dropdown-item" href="#">Action three</a></li>
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <br>
-
-  <div class="row justify-content-center">
-    <div class="col-md-6 text-center">
-      <button class="btn btn-secondary rounded-pill px-5" type="button">Search</button>
+      <button id="searchButton" class="btn btn-secondary rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Search</button>
     </div>
   </div>
 </div>
@@ -257,13 +226,160 @@ h1 {
 <script>
   // JavaScript
   const fetchDishButton = document.getElementById('fetchDishButton');
+  const searchButton = document.getElementById('searchButton');
   const modal = document.getElementById('dishModal');
-  fetchDishButton.addEventListener('click', fetchDish);
+  fetchDishButton.addEventListener('click', fetchRandomDish);
+  searchButton.addEventListener('click', fetchSearchedDish);
 
-  function fetchDish() {
+  $(document).ready(function() {
+      // Get the slider input element
+      var sliderInput = document.getElementById("sliderInput");
+
+      // Get the value display element
+      var sliderValue = document.getElementById("minuteValue");
+
+      // Update the value display when the slider value changes
+      sliderInput.addEventListener("input", function() {
+        sliderValue.innerText = sliderInput.value;
+      });
+    });
+
+    
+let ingredients = [];
+
+// Get the form and the ingredient list
+const form = document.getElementById("ingredient-form");
+const ingredientList = document.getElementById("ingredient-list");
+
+// Handle form submission
+form.addEventListener("submit", function(event) {
+  event.preventDefault(); // Prevent form submission
+
+  // Get the input value
+  const input = document.getElementById("ingredient-input");
+  const ingredient = input.value.trim();
+
+  // Add ingredient to the list if it's not empty and not already added
+  if (ingredient !== "" && !ingredients.includes(ingredient)) {
+    ingredients.push(ingredient);
+
+    // Create a new list item
+    const listItem = document.createElement("li");
+    // Create a span element for the ingredient name
+    const ingredientName = document.createElement("span");
+    ingredientName.textContent = ingredient;
+    listItem.appendChild(ingredientName);
+
+    // Create a button to remove the ingredient
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "-";
+    removeButton.addEventListener("click", function() {
+      removeIngredient(ingredient);
+    });
+    listItem.appendChild(removeButton);
+
+    // Append the list item to the ingredient list
+    ingredientList.appendChild(listItem);
+
+    // Clear the input field
+    input.value = "";
+  }
+});
+
+// Function to remove an ingredient from the list
+function removeIngredient(ingredient) {
+  const index = ingredients.indexOf(ingredient);
+  if (index !== -1) {
+    ingredients.splice(index, 1);
+    refreshIngredientList();
+  }
+}
+
+// Function to refresh the ingredient list
+function refreshIngredientList() {
+  // Clear the list
+  ingredientList.innerHTML = "";
+
+  // Re-populate the list
+  ingredients.forEach(function(ingredient) {
+    const listItem = document.createElement("li");
+
+    const ingredientName = document.createElement("span");
+    ingredientName.textContent = ingredient;
+    listItem.appendChild(ingredientName);
+
+    const removeButton = document.createElement("button");
+    removeButton.textContent = "Remove";
+    removeButton.addEventListener("click", function() {
+      removeIngredient(ingredient);
+    });
+    listItem.appendChild(removeButton);
+
+    ingredientList.appendChild(listItem);
+  });
+}
+
+  function fetchRandomDish() {
     fetch('/dish') // Assuming the server handles requests to '/dish' endpoint
-      .then(response => response.json())
+      .then(response => response.json)
       .then(data => {
+        modal.innerHTML = `
+        <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+        <div class="modal-header border-bottom-0">
+          <h1 class="modal-title fs-5">${data.name}</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body py-0">
+          <p>${data.description}</p>
+        </div>
+        <div class="modal-footer flex-column align-items-stretch w-100 gap-2 pb-3 border-top-0">
+          <a type="button" class="btn btn-lg btn-primary" href="/readMore?dish=${data.name}">Read More</a>
+        </div>
+      </div>
+      </div>
+        `;
+  })
+      .catch(error => {
+        console.error('Error:', error);
+      });
+  }
+
+  function fetchSearchedDish() {
+    var sliderValue = document.getElementById("minuteValue");
+    var complexitySelect = document.getElementById("complexitySelect");
+    const data = {
+      minutes: parseInt(sliderValue.innerText),
+      complexity: complexitySelect.value,
+      ingredients: ingredients
+    }
+    fetch('/searchDish', {
+    method: 'POST',
+    headers: {
+    'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)}) // Assuming the server handles requests to '/dish' endpoint
+      .then(response => { 
+        if(response.status === 204) {
+        return;
+      }
+      else if(response.ok) {
+        return response.json()
+      }})
+      .then(data => {
+        if(!data) {
+          modal.innerHTML = `
+          <div class="modal-dialog" role="document">
+        <div class="modal-content rounded-4 shadow">
+        <div class="modal-header border-bottom-0">
+          <h1 class="modal-title fs-5">No Results Found</h1>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+      </div>
+      </div>
+        `;
+          return;
+        }
         modal.innerHTML = `
         <div class="modal-dialog" role="document">
         <div class="modal-content rounded-4 shadow">
