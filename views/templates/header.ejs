@@ -90,6 +90,7 @@
             height="60"
             alt="SpiceOfLife
             logo"
+            id="logo"
           />
           <span class="fs-4">SpiceOfLife</span>
         </a>
@@ -132,6 +133,22 @@
     } else if (currentUrl.includes("/search")) {
       searchLink.classList.add("active");
     }
+
+    $.ajax({
+      url: `/easterEggCheck`, // Assuming the server handles requests to '/function' endpoint
+      method: "GET", // Use 'POST' if the function requires additional data
+      success: function (response) {
+        // Handle the server response if needed
+        if(response.cat) {
+          var logo = document.getElementById("logo");
+          logo.setAttribute('src', '/images/logoCat.png');
+        }
+      },
+      error: function (error) {
+        console.error("Error:", error);
+      },
+    });
+
   </script>
 
   <style>

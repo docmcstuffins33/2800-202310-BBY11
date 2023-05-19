@@ -18,6 +18,8 @@ const expireTime = 60 * 60 * 1000; //expires after 1 hour  (minutes * seconds * 
 
 const numDishes = 231637;
 
+var meow = false;
+
 /* secret information section */
 const mongodb_host = process.env.MONGODB_HOST;
 const mongodb_user = process.env.MONGODB_USER;
@@ -119,6 +121,26 @@ app.get('/dish', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     });
 });
+
+app.get('/easterEggCheck', async (req,res) => {
+  console.log(meow)
+  var cat = meow;
+  const response = {cat: cat};
+  res.json(response);
+})
+
+app.get('/meow', async (req,res) => {
+  console.log(meow);
+  if(meow) {
+    meow = false;
+  } else {
+    meow = true;
+  }
+  console.log(meow);
+  console.log("meow");
+  req.session.save();
+  res.send("all good :3");
+})
 
 app.post('/searchDish', async (req,res) => {
 
