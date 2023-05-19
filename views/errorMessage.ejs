@@ -1,29 +1,42 @@
 <%- include("templates/header") %>
+<style>
+  body {
+    background-color: #fff8d6;
+  }
+
+  h2 {
+    font-size: 35px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+    letter-spacing: 2px;
+    color: #333;
+  }
+</style>
 
 <div class="container">
-    <div class="text-center">
-        <img src="/images/cat_staring.gif" id="cat" play="false">
-        <h2><%= error %>!</h2>
-    </div>
+  <div class="text-center">
+    <img src="/images/cat_staring.gif" id="cat" play="false" />
+    <h2><%= error %>!</h2>
+  </div>
 </div>
 
-
 <script>
-    var catClicks = 0;
-    const cat = document.getElementById('cat');
-    cat.addEventListener('click', meow);
+  var catClicks = 0;
+  const cat = document.getElementById("cat");
+  cat.addEventListener("click", meow);
 
-    function meow() {
-        var meow = new Audio('/sounds/meow.mp3')
-        meow.play();
-        catClicks++
-        console.log(catClicks);
-        if(catClicks == 10) {
+  function meow() {
+    var meow = new Audio("/sounds/meow.mp3");
+    meow.play();
+    catClicks++;
+    console.log(catClicks);
+    if (catClicks == 10) {
             var holy = new Audio('/sounds/holy.wav')
             holy.play();
             
-        }
     }
+  }
 </script>
 
 <%- include("templates/footer") %>
