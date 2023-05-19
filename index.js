@@ -120,6 +120,12 @@ app.get('/dish', async (req, res) => {
     });
 });
 
+app.get('/meow', async (req,res) => {
+  req.session.cat = true;
+  console.log("meow");
+  res.status(200);
+})
+
 app.post('/searchDish', async (req,res) => {
 
   var timeToCook = req.body.minutes;
