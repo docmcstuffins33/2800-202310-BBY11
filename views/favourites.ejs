@@ -1,9 +1,50 @@
 <%- include("templates/header") %>
+<style>
+
+body {
+      background-color: #FFF8D6;
+    }
+
+h1 {
+  font-size: 35px;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+  letter-spacing: 2px;
+  color: #333;
+}    
+.favourites {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    position: relative;
+    z-index: 1;
+  }
+
+  .favourites .log-card {
+    width: calc(33.33% - 20px);
+    margin-bottom: 5px;
+    margin-top: 5px;
+  }
+
+  /* Media queries for responsiveness */
+  @media screen and (max-width: 768px) {
+    .favourites .log-card {
+      width: calc(50% - 20px);
+    }
+  }
+
+  @media screen and (max-width: 480px) {
+    .favourites .log-card {
+      height: 0%;
+      width: 50%;
+    }
+  }
 
 
-<div class="text-center">
-    <h1 style="font-family: 'Arial', sans-serif; color: #333; margin-top: 50px; margin-bottom: 30px;">Favourites</h1>
-  </div>
+</style>
+
+<h1 style="font-family: 'Arial', sans-serif; color: #333; margin-top: 50px; margin-bottom: 30px;">Favourites</h1>
 
 <div class="favourites">
   <% for (let i = dishes.length-1; i > -1; i--) { %>

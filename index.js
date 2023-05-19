@@ -12,6 +12,7 @@ const port = process.env.PORT || 3000;
 
 const app = express();
 const Joi = require("joi");
+const { time } = require("console");
 
 const expireTime = 60 * 60 * 1000; //expires after 1 hour  (minutes * seconds * millis)
 
@@ -43,7 +44,7 @@ const dishCollection = database.db(mongodb_database).collection("dishes");
 
 
 app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
 
 app.set('view engine', 'ejs');
 
@@ -82,7 +83,7 @@ app.use('*', sessionValidation);
 
 app.get('/', (req, res) => {
   //await userCollection.insertOne({username: "test", email: "test@gmail.com", password: "pass"});
-  res.render('index');
+  res.render('search');
 });
 
 app.get('/dish/:id', function (req, res) {
@@ -118,6 +119,53 @@ app.get('/dish', async (req, res) => {
       res.status(500).json({ error: 'Internal Server Error' });
     });
 });
+
+app.post('/searchDish', async (req,res) => {
+
+  var timeToCook = req.body.minutes;
+
+  var complexity = req.body.complexity
+
+  var ingredients = req.body.ingredients
+
+  console.log(req.body)
+
+  var conditions = ingredients.map(value => ({
+    'ingredients': { $in: [new RegExp(value, "i")]}
+  }));
+
+  conditions.push({ $expr: { $lte: [ { $toInt: '$minutes' }, timeToCook ] } });
+
+  if(complexity == "easy") {
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 6 ] } });
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 6] } });
+  }
+  if(complexity == "medium") {
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 11 ] } });
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 8] } });
+  }
+  if(complexity == "complex") {
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_steps' }, 10 ] } });
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_ingredients' }, 9] } });
+  }
+
+  const query = { $and: conditions};
+
+  var dishes = await dishCollection.find(query).toArray();
+  if (dishes.length == 0) {
+    res.status(204).json({'error': 1})
+  } else {
+      var dishNum = Math.floor(Math.random() * dishes.length);
+      console.log(dishes.length);
+      var dish = dishes[dishNum];
+      console.log(dish);
+      req.session.history.push(dish);
+      if(req.session.loggedIn) {
+        userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
+      }
+      res.json(dish); // Send the dish as a JSON response
+    }
+})
 
 
 app.get('/dishcard', (req, res) => {
@@ -285,9 +333,102 @@ app.get('/profile', async (req, res) => {
   }
 });
 
-app.post('/dietarySave', async (req, res) => {
+app.post('/saveDietaryRestriction', async (req, res) => {
   var dietaryRestriction = req.body.dietaryRestriction;
+  var excludedIngredients = [];
+
+  // Check the dietary restriction and assign the corresponding excluded ingredients list
+  if (dietaryRestriction === 'Vegetarian') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      "Turkey",
+      "Duck",
+      "Fish",
+      "Salmon",
+      "Shrimp",
+      "Tuna",
+      "Crab",
+      "Lobster",
+      "Gelatin",
+      "Animal fats",
+      "Lard",
+      "Suet",
+      "Tallow",
+      "broth",
+      "Rennet",
+      "Cochineal",
+      "Isinglass"
+      // Add other vegetarian-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Vegan') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      "Turkey",
+      "Duck",
+      "Fish",
+      "Salmon",
+      "Shrimp",
+      "Tuna",
+      "Crab",
+      "Lobster",
+      "Gelatin",
+      "Animal fats",
+      "Lard",
+      "Suet",
+      "Tallow",
+      "broth",
+      "Rennet",
+      "Cochineal",
+      "Isinglass",
+      "milk",
+      "cheese",
+      "yogurt",
+      "butter",
+      "cream",
+      "whey"
+      // Add other vegan-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Pescatarian') {
+    excludedIngredients = [
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      // Add other pescatarian-excluded ingredients here
+    ];
+  } else if (dietaryRestriction === 'Gluten-Free') {
+    excludedIngredients = [
+      "Wheat",
+      "Barley",
+      "Rye",
+      "Oats",
+      "Yeast",
+      "Flour",
+      "Bran",
+      "Farina",
+      "Starch",
+      "Bran"
+    ];
+  } else if (dietaryRestriction === 'Dairy-Free') {
+    excludedIngredients = [
+      "milk",
+      "cheese",
+      "yogurt",
+      "butter",
+      "cream",
+      "whey"
+    ];
+  }
+
   var drlist = req.session.dietaryRestrictions;
+
+  console.log(dietaryRestriction);
 
   const schema = Joi.string().max(20).required();
   const validationResult = schema.validate(dietaryRestriction);
@@ -300,7 +441,46 @@ app.post('/dietarySave', async (req, res) => {
   drlist.push(dietaryRestriction);
   req.session.dietaryRestrictions = drlist;
 
-  await userCollection.updateOne({username: req.session.username}, {$set: {dietaryRestrictions: drlist}});
+  // Update the user's dietary restrictions and excluded ingredients in the database
+  await userCollection.updateOne(
+    { username: req.session.username },
+    { $set: { dietaryRestrictions: drlist, excludedIngredients: excludedIngredients } }
+  );
+
+  res.redirect('/profile');
+});
+
+
+
+app.get('/ingredients', async (req, res) => {
+  try {
+    const ingredients = await dishCollection.distinct("ingredients");
+    res.json(ingredients);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+});
+
+
+app.post('/allergySave', async (req, res) => {
+  var allergy = req.body.foodAllergy;
+  var allergylist = req.session.allergies || [];
+
+  console.log(allergy);
+
+  const schema = Joi.string().max(20).required();
+  const validationResult = schema.validate(allergy);
+  if (validationResult.error != null) {
+    console.log(validationResult.error);
+    res.redirect("/profile");
+    return;
+  }
+
+  allergylist.push(allergy);
+  req.session.allergies = allergylist;
+
+  await userCollection.updateOne({ username: req.session.username }, { $set: { allergies: allergylist } });
   res.redirect('/profile');
 });
 
