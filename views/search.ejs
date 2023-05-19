@@ -189,21 +189,6 @@ h1 {
     </div>
   </div>
 
-  <div class="container mt-4">
-    <div class="input-group">
-      <span class="input-group-prepend">
-        <button class="btn btn-outline-secondary" type="button" id="decreaseBtn">
-          <i class="fa fa-minus"></i>
-        </button>
-      </span>
-      <input type="number" class="form-control" id="numberInput" value="0">
-      <span class="input-group-append">
-        <button class="btn btn-outline-secondary" type="button" id="increaseBtn">
-          <i class="fa fa-plus"></i>
-        </button>
-      </span>
-    </div>
-  </div>
 
   <br>
 
@@ -288,7 +273,7 @@ form.addEventListener("submit", function(event) {
 
     // Create a button to remove the ingredient
     const removeButton = document.createElement("button");
-    removeButton.textContent = "Remove";
+    removeButton.textContent = "-";
     removeButton.addEventListener("click", function() {
       removeIngredient(ingredient);
     });
