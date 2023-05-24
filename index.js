@@ -163,12 +163,14 @@ app.post('/searchDish', async (req,res) => {
     conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 6] } });
   }
   if(complexity == "medium") {
-    conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 11 ] } });
-    conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 8] } });
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 10 ] } });
+    conditions.push({ $expr: { $lte: [ { $toInt: '$n_ingredients' }, 10] } });
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_steps' }, 7 ] } });
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_ingredients' }, 7] } });
   }
   if(complexity == "complex") {
-    conditions.push({ $expr: { $gte: [ { $toInt: '$n_steps' }, 10 ] } });
-    conditions.push({ $expr: { $gte: [ { $toInt: '$n_ingredients' }, 9] } });
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_steps' }, 11 ] } });
+    conditions.push({ $expr: { $gte: [ { $toInt: '$n_ingredients' }, 11] } });
   }
 
   const query = { $and: conditions};
