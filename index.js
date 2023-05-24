@@ -479,7 +479,23 @@ app.post('/saveDietaryRestriction', async (req, res) => {
 app.get('/ingredients', async (req, res) => {
   try {
     const ingredients = await dishCollection.distinct("ingredients");
-    res.json(ingredients);
+    var ingredientsList = {};
+
+  // Iterate over each object in the input JSON array
+   ingredients.forEach(function(obj) {
+    // Extract the first letter of the name
+    var firstLetter = obj.charAt(0).toLowerCase();
+
+    // Create an array for the current letter if it doesn't exist
+    if (!ingredientsList[firstLetter]) {
+      ingredientsList[firstLetter] = [];
+    }
+
+    // Add the current object to the array
+    ingredientsList[firstLetter].push(obj);
+  });
+
+    res.json(ingredientsList.e);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
