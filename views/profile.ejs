@@ -45,6 +45,11 @@
           <td>
             <% dietaryRestriction.forEach(function(item) { %>
             <p><%= item %></p>
+            <form method="POST" action="/removeDietaryRestriction">
+              <!-- Hidden input to send the dietary restriction to be removed -->
+              <input type="hidden" name="dietaryRestriction" value="<%= item %>">
+              <button class="w-20 btn btn-lg btn-danger" type="submit">Remove</button>
+            </form>
             <% }); %>
             <form method="POST" action="/saveDietaryRestriction">
               <!-- Dropdown menu code -->
@@ -63,21 +68,8 @@
           </td>
         </tr>
       </tbody>
-      <thead>
-        <tr>
-          <th scope="col">Food Allergy(s)</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>
-            <form action="/allergySave" method="post">
-              <input type="text" class="form-control" name="foodAllergy" id="foodAllergy">
-              <button class="w-20 btn btn-lg btn-primary">Save</button>
-            </form>
-          </td>
-        </tr>
-      </tbody>
+      
+      
     </table>
   </div>
 
@@ -100,28 +92,5 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>   
 
-<script>
-  $(function() {
-    $("#foodAllergy").autocomplete({
-      source: function(request, response) {
-        $.ajax({
-          url: "/ingredients", // Endpoint URL
-          method: "GET",
-          data: {
-            query: request.term
-          },
-          success: function(data) {
-            response(data);
-          }
-        });
-      },
-      minLength: 1, // Minimum input length to trigger autocomplete
-      select: function(event, ui) {
-        $("#foodAllergy").val(ui.item.value); // Set the selected value in the input field
-        return false;
-      }
-    });
-  });
-</script>
 
 <%- include("templates/footer") %>

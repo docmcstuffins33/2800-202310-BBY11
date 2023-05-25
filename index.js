@@ -450,9 +450,10 @@ app.post('/saveDietaryRestriction', async (req, res) => {
     ];
   }
 
-  var drlist = req.session.dietaryRestrictions;
+  const existingExcludedIngredients = req.session.excludedIngredients || []; // Get the existing excluded ingredients list
 
-  console.log(dietaryRestriction);
+  // Merge the existing and new excluded ingredients lists without duplicates
+  const mergedExcludedIngredients = Array.from(new Set([...existingExcludedIngredients, ...excludedIngredients]));
 
   const schema = Joi.string().max(20).required();
   const validationResult = schema.validate(dietaryRestriction);
@@ -462,17 +463,38 @@ app.post('/saveDietaryRestriction', async (req, res) => {
     return;
   }
 
+  const drlist = req.session.dietaryRestrictions || [];
   drlist.push(dietaryRestriction);
-  req.session.dietaryRestrictions = drlist;
 
   // Update the user's dietary restrictions and excluded ingredients in the database
   await userCollection.updateOne(
     { username: req.session.username },
-    { $set: { dietaryRestrictions: drlist, excludedIngredients: excludedIngredients } }
+    { $set: { dietaryRestrictions: drlist, excludedIngredients: mergedExcludedIngredients } }
+  );
+
+  req.session.dietaryRestrictions = drlist;
+  req.session.excludedIngredients = mergedExcludedIngredients;
+
+  res.redirect('/profile');
+});
+
+app.post('/removeDietaryRestriction', async (req, res) => {
+  const dietaryRestriction = req.body.dietaryRestriction;
+
+  const drlist = req.session.dietaryRestrictions || [];
+  const updatedDRList = drlist.filter(item => item !== dietaryRestriction); // Filter out the dietary restriction to be removed
+
+  req.session.dietaryRestrictions = updatedDRList;
+
+  // Update the user's dietary restrictions in the database
+  await userCollection.updateOne(
+    { username: req.session.username },
+    { $set: { dietaryRestrictions: updatedDRList } }
   );
 
   res.redirect('/profile');
 });
+
 
 
 
@@ -484,28 +506,6 @@ app.get('/ingredients', async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Internal Server Error" });
   }
-});
-
-
-app.post('/allergySave', async (req, res) => {
-  var allergy = req.body.foodAllergy;
-  var allergylist = req.session.allergies || [];
-
-  console.log(allergy);
-
-  const schema = Joi.string().max(20).required();
-  const validationResult = schema.validate(allergy);
-  if (validationResult.error != null) {
-    console.log(validationResult.error);
-    res.redirect("/profile");
-    return;
-  }
-
-  allergylist.push(allergy);
-  req.session.allergies = allergylist;
-
-  await userCollection.updateOne({ username: req.session.username }, { $set: { allergies: allergylist } });
-  res.redirect('/profile');
 });
 
 app.get('/reset', (req, res) => {
