@@ -1,125 +1,171 @@
 <%- include("templates/header") %>
 
-  <link rel="stylesheet" href="/css/style.css">
+<link rel="stylesheet" href="/css/style.css">
 
-  <style>
+<style>
+  .btn {
+    width: auto;
+    margin: 10px;
+  }
+
+  .user-info-container {
+    border: 1px solid black;
+    padding: 10px;
+    margin-bottom: 20px;
+  }
+
+  .table.table-hover.table-centered {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .table.table-hover.table-centered tbody tr {
+    border-bottom: none;
+  }
+
+  .user-info-container table {
+    border-collapse: collapse;
+  }
+
+  .user-info-container tbody td {
+    border: none;
+  }
+
+  /* Media query for mobile devices */
+  @media (max-width: 767px) {
     .btn {
       width: auto;
-      margin: 10px
+      margin: 5px;
+      padding: 5px 10px;
+      font-size: 12px;
     }
 
     .user-info-container {
-      border: 1px solid black;
-      padding: 10px;
-      margin-bottom: 20px;
-    }
-    
-    .table.table-hover.table-centered {
-      border-collapse: separate;
-      border-spacing: 0;
+      display: flex;
+      flex-wrap: wrap;
     }
 
-    .table.table-hover.table-centered tbody tr {
-      border-bottom: none;
+    .dietary-restriction-item {
+      display: flex;
+      align-items: center;
+      margin: 5px 0;
     }
 
-    .user-info-container table {
-      border-collapse: collapse;
+    .dietary-restriction-item p {
+      margin: 0 10px 0 0;
+    }
+  }
+
+  /* Media query for web view */
+  @media (min-width: 768px) {
+    .user-info-container {
+      display: block;
     }
 
-    .user-info-container tbody td {
-      border: none;
+    .dietary-restriction-list {
+      list-style-type: none;
+      padding: 0;
     }
-  </style>
 
-  <div class="container">
-    <h1>Hello, <%= username %>
-    </h1>
+    .dietary-restriction-item {
+      margin-bottom: 10px;
+    }
 
-    <div class="user-info-container">
-      <div class="container-fluid">
-        <h3>User Information</h3>
-        <table class="table table-hover table-centered">
-          <thead>
-            <tr>
-              <th scope="col">Username</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <%= username %>
-              </td>
-            </tr>
-          </tbody>
-          <thead>
-            <tr>
-              <th scope="col">Email</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <%= email %>
-              </td>
-            </tr>
-          </tbody>
-          <thead>
-            <tr>
-              <th scope="col">Dietary Restriction(s)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
+    .dietary-restriction-item p {
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .dietary-restriction-item form {
+      display: inline-block;
+    }
+  }
+</style>
+
+<div class="container">
+  <h1>Hello, <%= username %></h1>
+
+  <div class="user-info-container">
+    <div class="container-fluid">
+      <h3>User Information</h3>
+      <table class="table table-hover table-centered">
+        <thead>
+          <tr>
+            <th scope="col">Username</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= username %></td>
+          </tr>
+        </tbody>
+        <thead>
+          <tr>
+            <th scope="col">Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><%= email %></td>
+          </tr>
+        </tbody>
+        <thead>
+          <tr>
+            <th scope="col">Dietary Restriction(s)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <ul class="dietary-restriction-list">
                 <% dietaryRestriction.forEach(function(item) { %>
-                <p><%= item %></p>
-                <form method="POST" action="/removeDietaryRestriction">
-                  <!-- Hidden input to send the dietary restriction to be removed -->
-                  <input type="hidden" name="dietaryRestriction" value="<%= item %>">
-                  <button class="w-20 btn btn-lg btn-danger" type="submit">Remove</button>
-                </form>
+                <li class="dietary-restriction-item">
+                  <p><%= item %></p>
+                  <form method="POST" action="/removeDietaryRestriction">
+                    <!-- Hidden input to send the dietary restriction to be removed -->
+                    <input type="hidden" name="dietaryRestriction" value="<%= item %>">
+                    <button class="btn btn-danger" type="submit">Remove</button>
+                  </form>
+                </li>
                 <% }); %>
-                <form method="POST" action="/saveDietaryRestriction">
-                  <!-- Dropdown menu code -->
-                  <select name="dietaryRestriction">
-                    <!-- Options for the dropdown -->
-                    <option value="">Select a dietary restriction</option>
-                    <option value="Vegetarian">Vegetarian</option>
-                    <option value="Vegan">Vegan</option>
-                    <option value="Pescatarian">Pescatarian</option>
-                    <option value="Gluten-free">Gluten-free</option>
-                    <option value="Dairy-free">Dairy-free</option>
-                    <!-- Add more options as needed -->
-                  </select>
-                  <button class="w-20 btn btn-lg btn-primary" type="submit">Add</button>
-                </form>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+              </ul>
+              <form method="POST" action="/saveDietaryRestriction">
+                <!-- Dropdown menu code -->
+                <select name="dietaryRestriction">
+                  <!-- Options for the dropdown -->
+                  <option value="">Select a dietary restriction</option>
+                  <option value="Vegetarian">Vegetarian</option>
+                  <option value="Vegan">Vegan</option>
+                  <option value="Pescatarian">Pescatarian</option>
+                  <option value="Gluten-free">Gluten-free</option>
+                  <option value="Dairy-free">Dairy-free</option>
+                  <!-- Add more options as needed -->
+                </select>
+                <button class="btn btn-primary" type="submit">Add</button>
+              </form>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
-    <form action="/favourites" method="get">
-      <button class="w-200 btn btn-lg btn-primary">Favourites</button>
-    </form>
-
-    <form action="/reset" method="get">
-      <button class="w-20 btn btn-lg btn-primary">Reset Password</button>
-    </form>
-
-    <form action="/logout" method="get">
-      <button class="w-20 btn btn-lg btn-primary">Logout</button>
-    </form>
   </div>
 
-  <br>
-  <br>
-  <br>
+  <form action="/favourites" method="get">
+    <button class="w-200 btn btn-lg btn-primary">Favourites</button>
+  </form>
+
+  <form action="/reset" method="get">
+    <button class="w-20 btn btn-lg btn-primary">Reset Password</button>
+  </form>
+
+  <form action="/logout" method="get">
+    <button class="w-20 btn btn-lg btn-primary">Logout</button>
+  </form>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
+
+<%- include("templates/footer") %>
 
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script src="https://code.jquery.com/ui/1.13.0/jquery-ui.min.js"></script>
-
-
-  <%- include("templates/footer") %>
