@@ -208,6 +208,10 @@ app.get('/readMore', (req, res) => {
     var history = req.session.history;
     console.log(history)
     var dish = history.find(element => element.name == req.query.dish);
+    if(dish == undefined) {
+      res.redirect("/404");
+      return
+    }
     console.log(req.query.dish)
     res.render('readMorePage', {dish: dish, loggedIn: req.session.loggedIn});
 });
