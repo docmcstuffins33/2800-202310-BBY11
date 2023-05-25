@@ -62,6 +62,7 @@ function sessionValidation(req,res,next) {
   if(!req.session.authenticated) {
     req.session.authenticated = true;
     req.session.loggedIn = false;
+    req.session.meow = false;
     req.session.history = [];
     req.session.cookie.maxAge = expireTime;
   }
@@ -123,21 +124,28 @@ app.get('/dish', async (req, res) => {
 });
 
 app.get('/easterEggCheck', async (req,res) => {
-  console.log(meow)
-  var cat = meow;
+  req.session.save();
+  console.log(req.session.meow)
+  var cat = req.session.meow;
   const response = {cat: cat};
   res.json(response);
 })
 
 app.get('/meow', async (req,res) => {
-  console.log(meow);
-  if(meow) {
-    meow = false;
+  if(req.session.meow) {
+    req.session.meow = false;
+    req.session.save();
   } else {
-    meow = true;
+    req.session.meow = true;
+    req.session.save();
   }
-  console.log(meow);
-  console.log("meow");
+  console.log(req.session.meow)
+  req.session.save();
+  req.session.save();
+  req.session.save();
+  req.session.save();
+  req.session.save();
+  req.session.save();
   req.session.save();
   res.send("all good :3");
 })
@@ -318,13 +326,14 @@ app.post('/loginSubmit', async (req, res) => {
   }
   if (await bcrypt.compare(password, result[0].password)) {
     console.log("correct password");
-    req.session.loggedIn= true;
+    req.session.loggedIn = true;
     req.session.username = result[0].username;
     req.session.favourites = result[0].favourites;
     req.session.history = result[0].history.concat(req.session.history);
     userCollection.updateOne({username: req.session.username}, {$set: {history: req.session.history}});
     req.session.dietaryRestrictions = result[0].dietaryRestrictions;
     req.session.email = email;
+    await req.session.save();
     res.redirect('/profile');
     return;
   }

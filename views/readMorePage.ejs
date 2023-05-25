@@ -122,6 +122,9 @@
           </button>
           <% } %>
           <h5 class="card-title" id="dishTitle"><%= dish.name %></h5>
+          <section class="image-section"><div class="custom-spinner spinner-border text-primary" role="status">
+            <span class="visually-hidden">Loading...</span>
+          </div></section>
           <% if(dish.numFavs == undefined) { %>
           <p class="card-text">Number of favourites: 0</p>
           <% } else { %>
@@ -145,7 +148,6 @@
               <% } %> 
             </ol>
           </p>
-          <section class="image-section"></section>
         </div>
       </div>
     </div>
@@ -156,9 +158,11 @@
   // JavaScript
   const favouriteButton = document.getElementById("favourite");
   const dishTitle = document.getElementById("dishTitle");
-  favouriteButton.addEventListener("click", callFavourite);
+  if(favouriteButton != null) {
+    favouriteButton.addEventListener("click", callFavourite);
+  }
 
-  const api_key = API_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2FmNDkyMmUtOTVlNS00MzA2LTllYWQtM2Y3OGE3OTk4MjVkIiwidHlwZSI6ImFwaV90b2tlbiJ9.2i4A4Yvt63SD9GWS6-RHxj5bybWMPkKErvUyKyzyZZU";
+  const api_key = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiY2FmNDkyMmUtOTVlNS00MzA2LTllYWQtM2Y3OGE3OTk4MjVkIiwidHlwZSI6ImFwaV90b2tlbiJ9.2i4A4Yvt63SD9GWS6-RHxj5bybWMPkKErvUyKyzyZZU";
   const submitIcon = document.querySelector('#submit-icon');
   const inputElement = document.getElementById("dishTitle"); 
   const imageSection = document.querySelector('.image-section');
@@ -207,7 +211,8 @@
         const imageElement = document.createElement('img');
         imageElement.setAttribute('src', data.openai.items[0].image_resource_url);
         imageContainer.append(imageElement);
-        imageSection.append(imageContainer);
+        imageSection.innerText = "";
+        imageSection.append(imageContainer)
     } catch (error) {
       console.error(error);
     }
