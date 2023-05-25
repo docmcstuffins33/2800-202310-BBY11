@@ -29,7 +29,7 @@
 }
 
 h1 {
-  font-size: 25px;
+  font-size: 35px;
   font-weight: bold;
   text-align: center;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
@@ -51,15 +51,16 @@ h1 {
   }
 
   .btn-secondary {
-    background-color: #A6BB8D;
+    background-color:#3C6255;
     color: #ffffff;
-    border-color: #A6BB8D;
+    border-color: #3C6255;
     padding: 8px 18px;
+    border-radius: 30px;
   }
 
   .btn-secondary:hover {
-    background-color: #61876E;
-    border-color: #61876E;
+    background-color: #40513B;
+    border-color: #40513B;
   }
 
   .custom-spinner {
@@ -109,9 +110,9 @@ h1 {
   }
 
   .btn-primary {
-    background-color: #a6bb8d;
+    background-color:#3C6255;
     color: #ffffff;
-    border-color: #a6bb8d;
+    border-color: #3C6255;
     padding: 8px 18px;
   }
 
@@ -157,8 +158,6 @@ h1 {
   border-radius: 0; /* Remove the border radius */
 }
 
-
-
 </style>
 
 <div id="dishModal" class="modal fade" tabindex="-1" role="dialog">
@@ -186,27 +185,37 @@ h1 {
       <button id="fetchDishButton" class="btn btn-secondary rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Random Dish</button>
     </div>
   </div>
+</div>
 
+<div class="container" style="border: 5px solid #333; padding: 20px;">
   <h1 class="text-left" style="font-family: 'Arial', sans-serif; color: #333; margin-top: 50px; margin-bottom: 30px;">Filters</h1>
-
   <div class="row justify-content-center">
     <div class="col-md-6 text-center">
-      <h4>Complexity</h4>
+      <h4>Complexity      
+      <span class="tooltip-icon" data-bs-toggle="tooltip" data-bs-placement="top" 
+      title="Easy: 1-6 steps & ingredients |
+      Medium: 7-10 steps & ingredients |
+      Complex: 11+ steps & ingredients
+      ">
+        <svg xmlns="http://www.w3.org/2000/svg" width="21" height="21" viewBox="0 0 24 24" fill="none" stroke="#000000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+      </span>
+       </h4>
+      <div class="tooltip-wrapper">
         <select id="complexitySelect" class="form-select" aria-label="Default select example">
           <option value="easy">Easy</option>
           <option value="medium">Medium</option>
           <option value="complex">Complex</option>
         </select>
+      </div>
     </div>
   </div>
-
 
   <br>
 
   <div class="row justify-content-center">
     <div class="col-md-6 text-center">
         <h4>Time to cook: <span id="minuteValue">0</span> minutes</h4>
-      <input type="range" class="form-control-range" min="5" max="200" id="sliderInput" step="15">
+      <input type="number" class="form-control-range" min="5" max="200" id="sliderInput" step="15">
     </div>
   </div>
 
@@ -230,7 +239,7 @@ h1 {
       <button id="searchButton" class="btn btn-secondary rounded-pill px-5" data-bs-toggle="modal" data-bs-target="#dishModal" type="button">Search</button>
     </div>
   </div>
-</div>
+  </div>
 
 <br>
 
@@ -451,6 +460,11 @@ function fetchSearchedDish() {
       modalContent.classList.remove('loading'); // Remove loading class
     });
 }
+
+var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
 
 
 </script>
