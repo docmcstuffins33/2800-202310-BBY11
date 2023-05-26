@@ -125,7 +125,6 @@ app.get('/dish', async (req, res) => {
 
 app.get('/easterEggCheck', async (req,res) => {
   req.session.save();
-  console.log(req.session.meow)
   var cat = req.session.meow;
   const response = {cat: cat};
   res.json(response);
@@ -154,6 +153,8 @@ app.post('/searchDish', async (req,res) => {
 
   var ingredients = req.body.ingredients
 
+  var dietaryRestrictions = req.session.dietaryRestrictions
+
   console.log(req.body)
 
   var conditions = ingredients.map(value => ({
@@ -161,6 +162,105 @@ app.post('/searchDish', async (req,res) => {
   }));
 
   conditions.push({ $expr: { $lte: [ { $toInt: '$minutes' }, timeToCook ] } });
+
+  var excludedIngredients = [];
+
+  // Check the dietary restriction and assign the corresponding excluded ingredients list
+  if (dietaryRestrictions.includes('Vegetarian')) {
+    excludedIngredients.concat([
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      "Turkey",
+      "Duck",
+      "Fish",
+      "Salmon",
+      "Shrimp",
+      "Tuna",
+      "Crab",
+      "Lobster",
+      "Gelatin",
+      "Animal fats",
+      "Lard",
+      "Suet",
+      "Tallow",
+      "broth",
+      "Rennet",
+      "Cochineal",
+      "Isinglass"
+      // Add other vegetarian-excluded ingredients here
+    ])
+  }
+  if (dietaryRestrictions.includes('Vegan')) {
+    excludedIngredients.concat([
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      "Turkey",
+      "Duck",
+      "Fish",
+      "Salmon",
+      "Shrimp",
+      "Tuna",
+      "Crab",
+      "Lobster",
+      "Gelatin",
+      "Animal fats",
+      "Lard",
+      "Suet",
+      "Tallow",
+      "broth",
+      "Rennet",
+      "Cochineal",
+      "Isinglass",
+      "milk",
+      "cheese",
+      "yogurt",
+      "butter",
+      "cream",
+      "whey"
+      // Add other vegan-excluded ingredients here
+    ])
+  }
+  if (dietaryRestrictions.includes('Pescatarian')) {
+    excludedIngredients.concat([
+      "Beef",
+      "Pork",
+      "Lamb",
+      "Chicken",
+      // Add other pescatarian-excluded ingredients here
+    ])
+  }
+  if (dietaryRestrictions.includes('Gluten-Free')) {
+    excludedIngredients.concat([
+      "Wheat",
+      "Barley",
+      "Rye",
+      "Oats",
+      "Yeast",
+      "Flour",
+      "Bran",
+      "Farina",
+      "Starch",
+      "Bran"
+    ])
+  }
+  if (dietaryRestrictions.includes('Dairy-Free')) {
+    excludedIngredients.concat([
+      "milk",
+      "cheese",
+      "yogurt",
+      "butter",
+      "cream",
+      "whey"
+    ])
+  }
+
+  excludedIngredients.forEach(ingredient => {
+    conditions.push({'ingredients': { $in: [new RegExp(ingredient, "i")]}});
+  })
 
   if(complexity == "easy") {
     conditions.push({ $expr: { $lte: [ { $toInt: '$n_steps' }, 6 ] } });
