@@ -140,13 +140,9 @@ app.get('/meow', async (req,res) => {
     req.session.save();
   }
   console.log(req.session.meow)
-  req.session.save();
-  req.session.save();
-  req.session.save();
-  req.session.save();
-  req.session.save();
-  req.session.save();
-  req.session.save();
+  for(let i = 0; i < 10; i++) {
+    req.session.save();
+  }
   res.send("all good :3");
 })
 
